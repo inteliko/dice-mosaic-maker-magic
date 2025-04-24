@@ -1,5 +1,5 @@
 
-import { GitHub } from "lucide-react";
+import { Github } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -12,7 +12,7 @@ const Footer = () => {
             className="text-gray-500 hover:text-dice-primary transition-colors flex items-center gap-1"
             aria-label="GitHub"
           >
-            <GitHub size={16} />
+            <Github size={16} />
             <span>GitHub</span>
           </a>
           <span>·</span>
