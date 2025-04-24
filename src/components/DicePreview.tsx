@@ -25,8 +25,11 @@ const DicePreview = ({ diceGrid, settings }: DicePreviewProps) => {
     const rows = diceGrid.length;
     const cols = diceGrid[0].length;
     
-    // Set canvas size with a small margin for each cell
-    const cellSize = Math.min(400 / cols, 400 / rows);
+    // Adjust cell size based on grid dimensions with a maximum size
+    const maxSize = 20; // Maximum size for each dice
+    const cellSize = Math.min(maxSize, Math.min(600 / cols, 600 / rows));
+    
+    // Set canvas size 
     canvas.width = cols * cellSize;
     canvas.height = rows * cellSize;
     
@@ -45,18 +48,18 @@ const DicePreview = ({ diceGrid, settings }: DicePreviewProps) => {
         ctx.fillStyle = settings.faceColors[diceValue] || "#ffffff";
         ctx.fillRect(x, y, cellSize, cellSize);
         
-        // Draw border around dice
+        // Draw thinner border around dice
         ctx.strokeStyle = "#dddddd";
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = 0.3;
         ctx.strokeRect(x, y, cellSize, cellSize);
         
         if (settings.useShading) {
           // Draw dice face with dots
           drawDiceFace(ctx, diceValue, x, y, cellSize);
         } else {
-          // Draw dice value
+          // Draw dice value as number with smaller font
           ctx.fillStyle = "#000000";
-          ctx.font = `${cellSize * 0.6}px Arial`;
+          ctx.font = `${cellSize * 0.5}px Arial`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(diceValue.toString(), x + cellSize / 2, y + cellSize / 2);
@@ -73,10 +76,10 @@ const DicePreview = ({ diceGrid, settings }: DicePreviewProps) => {
     y: number,
     size: number
   ) => {
-    const dotSize = size * 0.15;
+    const dotSize = size * 0.12; // Smaller dots
     const padding = size * 0.2;
     
-    // Use contrasting color for dots based on face color
+    // Use contrasting color for dots
     const faceColor = settings.faceColors[value];
     const r = parseInt(faceColor.slice(1, 3), 16);
     const g = parseInt(faceColor.slice(3, 5), 16);
@@ -178,17 +181,18 @@ const DicePreview = ({ diceGrid, settings }: DicePreviewProps) => {
   if (!diceGrid.length) {
     return (
       <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-gray-50 h-96">
-        <p className="text-gray-500">No preview available. Upload an image and generate a mosaic.</p>
+        <p className="text-gray-500">Upload an image and generate a dice mosaic to see the preview.</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center p-4 border rounded-lg bg-white shadow-sm">
-      <div className="overflow-auto w-full max-h-96 flex items-center justify-center p-4">
+      <div className="overflow-auto w-full max-h-[calc(100vh-300px)] flex items-center justify-center p-4">
         <canvas
           ref={canvasRef}
-          className="max-w-full border shadow-sm"
+          className="max-w-full h-auto border shadow-sm"
+          style={{ imageRendering: "pixelated" }}
         />
       </div>
       
