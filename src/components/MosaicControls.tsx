@@ -3,7 +3,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Ruler, Height, Width } from "lucide-react";
+import { Ruler, Weight, Move } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 
 interface MosaicControlsProps {
@@ -79,11 +79,11 @@ const MosaicControls = ({ onGenerate }: MosaicControlsProps) => {
         
         <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600">
           <div className="flex items-center gap-2">
-            <Width className="w-4 h-4" />
+            <Move className="w-4 h-4" />
             <span>Width: {widthCm.toFixed(1)} cm</span>
           </div>
           <div className="flex items-center gap-2">
-            <Height className="w-4 h-4" />
+            <Weight className="w-4 h-4" />
             <span>Height: {heightCm.toFixed(1)} cm</span>
           </div>
           <div className="flex items-center gap-2">
