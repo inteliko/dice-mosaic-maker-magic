@@ -9,13 +9,13 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full px-4 py-4 border-b">
+    <header className="w-full px-4 py-4 border-b bg-white">
       <div className="container flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span role="img" aria-label="dice" className="text-2xl">🎲</span>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-dice-primary to-dice-secondary bg-clip-text text-transparent">
-            Dice Mosaic Maker
-          </h1>
+          <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-dice-primary to-dice-secondary bg-clip-text text-transparent">
+            Dice Mosaic Generator
+          </Link>
         </div>
         
         <nav>
@@ -25,23 +25,15 @@ const Header = () => {
                 to="/" 
                 className={`transition-colors hover:text-dice-primary ${isActive('/') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
               >
-                Home
+                Create
               </Link>
             </li>
             <li>
               <Link 
-                to="/about" 
-                className={`transition-colors hover:text-dice-primary ${isActive('/about') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
+                to="/blog" 
+                className={`transition-colors hover:text-dice-primary ${isActive('/blog') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
               >
-                About
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/export" 
-                className={`transition-colors hover:text-dice-primary ${isActive('/export') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
-              >
-                Export
+                Blog
               </Link>
             </li>
           </ul>

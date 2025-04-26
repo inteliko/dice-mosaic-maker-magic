@@ -1,29 +1,28 @@
 
-import { Github } from "lucide-react";
-
 const Footer = () => {
   return (
-    <footer className="w-full px-4 py-6 mt-8 border-t">
-      <div className="container flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
-        <p>© {new Date().getFullYear()} Dice Mosaic Maker. All rights reserved.</p>
-        <div className="flex items-center gap-4 mt-4 md:mt-0">
+    <footer className="w-full px-4 py-8 mt-8 bg-gray-900 text-white">
+      <div className="container mx-auto text-center">
+        <p className="mb-4">
+          If you found this tool helpful please consider supporting the developer, it is greatly appreciated!{" "}
           <a 
             href="#" 
-            className="text-gray-500 hover:text-dice-primary transition-colors flex items-center gap-1"
-            aria-label="GitHub"
+            className="text-yellow-400 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <Github size={16} />
-            <span>GitHub</span>
+            Buy me a coffee
           </a>
-          <span>·</span>
+        </p>
+        <p className="text-sm text-gray-400">
+          For business enquiries, questions, or concerns email us at{" "}
           <a 
-            href="#" 
-            className="text-gray-500 hover:text-dice-primary transition-colors"
-            aria-label="Contact"
+            href="mailto:dicemosaicgenerator@gmail.com" 
+            className="text-dice-primary hover:underline"
           >
-            Contact
+            dicemosaicgenerator@gmail.com
           </a>
-        </div>
+        </p>
       </div>
     </footer>
   );
