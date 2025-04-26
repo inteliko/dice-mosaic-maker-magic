@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,21 +11,25 @@ const Index = () => {
   const [settings, setSettings] = useState<MosaicSettings | null>(null);
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [blackDiceCount, setBlackDiceCount] = useState(0);
+  const [whiteDiceCount, setWhiteDiceCount] = useState(0);
 
   const handleImageUpload = (file: File) => {
     setImageFile(file);
-    // Clear previous results when a new image is uploaded
     setDiceGrid([]);
+    setBlackDiceCount(0);
+    setWhiteDiceCount(0);
   };
 
   const generateMosaic = async (newSettings: MosaicSettings) => {
     setSettings(newSettings);
     
     if (!imageFile) {
-      // For demo purposes, generate a sample grid if no image is uploaded
       const sampleGrid = generateSampleGrid(newSettings.gridSize);
       setDiceGrid(sampleGrid);
-      // Save to localStorage for the Export page
+      const counts = countDiceColors(sampleGrid);
+      setBlackDiceCount(counts.black);
+      setWhiteDiceCount(counts.white);
       localStorage.setItem("diceMosaicGrid", JSON.stringify(sampleGrid));
       return;
     }
@@ -39,13 +42,29 @@ const Index = () => {
         newSettings.contrast
       );
       setDiceGrid(grid);
-      // Save to localStorage for the Export page
+      const counts = countDiceColors(grid);
+      setBlackDiceCount(counts.black);
+      setWhiteDiceCount(counts.white);
       localStorage.setItem("diceMosaicGrid", JSON.stringify(grid));
     } catch (error) {
       console.error("Error processing image:", error);
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const countDiceColors = (grid: number[][]) => {
+    let black = 0;
+    let white = 0;
+    
+    grid.forEach(row => {
+      row.forEach(value => {
+        if (value === 6) black++;
+        if (value === 1) white++;
+      });
+    });
+    
+    return { black, white };
   };
 
   return (
@@ -71,7 +90,11 @@ const Index = () => {
                 
                 <div>
                   <h2 className="font-semibold mb-4">2. Configure Your Mosaic</h2>
-                  <MosaicControls onGenerate={generateMosaic} />
+                  <MosaicControls 
+                    onGenerate={generateMosaic} 
+                    blackDiceCount={blackDiceCount}
+                    whiteDiceCount={whiteDiceCount}
+                  />
                 </div>
               </div>
               

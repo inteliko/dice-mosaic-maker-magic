@@ -3,11 +3,13 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Ruler, Weight, Move } from "lucide-react";
+import { Ruler, Weight, Move, Circle, Square } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 
 interface MosaicControlsProps {
   onGenerate: (settings: MosaicSettings) => void;
+  blackDiceCount?: number;
+  whiteDiceCount?: number;
 }
 
 export interface MosaicSettings {
@@ -28,7 +30,7 @@ const DEFAULT_COLORS: Record<number, string> = {
 
 const DICE_SIZE_CM = 1.6;
 
-const MosaicControls = ({ onGenerate }: MosaicControlsProps) => {
+const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0 }: MosaicControlsProps) => {
   const [gridSize, setGridSize] = useState(20);
   const [contrast, setContrast] = useState(50);
   const [useShading, setUseShading] = useState(true);
@@ -89,6 +91,17 @@ const MosaicControls = ({ onGenerate }: MosaicControlsProps) => {
           <div className="flex items-center gap-2">
             <Ruler className="w-4 h-4" />
             <span>Dice Size: {DICE_SIZE_CM} cm</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600 border-t pt-2">
+          <div className="flex items-center gap-2">
+            <Square className="w-4 h-4" />
+            <span>Black Dice: {blackDiceCount}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Circle className="w-4 h-4" />
+            <span>White Dice: {whiteDiceCount}</span>
           </div>
         </div>
       </div>
