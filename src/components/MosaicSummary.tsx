@@ -1,5 +1,4 @@
-
-import { FileImage, FileText, Shop, Blog } from "lucide-react";
+import { FileImage, FileText, ShoppingCart, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MosaicSummaryProps {
@@ -84,11 +83,11 @@ const MosaicSummary = ({
               <span>Use our dice counter to check how many dice you will need for the project</span>
             </li>
             <li className="flex items-center gap-2">
-              <Shop className="w-5 h-5 text-primary" />
+              <ShoppingCart className="w-5 h-5 text-primary" />
               <span>Head over to our shop where you can purchase the dice in bulk</span>
             </li>
             <li className="flex items-center gap-2">
-              <Blog className="w-5 h-5 text-primary" />
+              <BookOpen className="w-5 h-5 text-primary" />
               <span>Read our blog for tips and tricks about how to create dice mosaics</span>
             </li>
           </ul>
