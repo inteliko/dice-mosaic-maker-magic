@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Ruler, Height, Width } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 
 interface MosaicControlsProps {
@@ -18,13 +18,15 @@ export interface MosaicSettings {
 }
 
 const DEFAULT_COLORS: Record<number, string> = {
-  1: "#FFFFFF", // White
-  2: "#DDDDDD", // Light Gray
-  3: "#BBBBBB", // Medium Light Gray
-  4: "#888888", // Medium Gray
-  5: "#555555", // Dark Gray
-  6: "#222222", // Almost Black
+  1: "#FFFFFF",
+  2: "#DDDDDD",
+  3: "#BBBBBB",
+  4: "#888888",
+  5: "#555555",
+  6: "#222222",
 };
+
+const DICE_SIZE_CM = 1.6;
 
 const MosaicControls = ({ onGenerate }: MosaicControlsProps) => {
   const [gridSize, setGridSize] = useState(20);
@@ -55,21 +57,40 @@ const MosaicControls = ({ onGenerate }: MosaicControlsProps) => {
     setFaceColors({...DEFAULT_COLORS});
   };
 
+  const totalDice = gridSize * gridSize;
+  const widthCm = gridSize * DICE_SIZE_CM;
+  const heightCm = gridSize * DICE_SIZE_CM;
+
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm space-y-6">
       <div className="space-y-3">
         <div className="flex justify-between">
           <Label htmlFor="grid-size">Grid Size: {gridSize}×{gridSize}</Label>
-          <span className="text-sm text-gray-500">{gridSize * gridSize} dice</span>
+          <span className="text-sm text-gray-500">{totalDice} dice</span>
         </div>
         <Slider 
           id="grid-size"
           min={10} 
-          max={50} 
+          max={100} 
           step={1} 
           value={[gridSize]} 
           onValueChange={(values) => setGridSize(values[0])} 
         />
+        
+        <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <Width className="w-4 h-4" />
+            <span>Width: {widthCm.toFixed(1)} cm</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Height className="w-4 h-4" />
+            <span>Height: {heightCm.toFixed(1)} cm</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Ruler className="w-4 h-4" />
+            <span>Dice Size: {DICE_SIZE_CM} cm</span>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-3">

@@ -22,8 +22,9 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     const rows = diceGrid.length;
     const cols = diceGrid[0].length;
     
-    const maxSize = 20;
-    const cellSize = Math.min(maxSize, Math.min(600 / cols, 600 / rows));
+    // Adjust cell size based on grid dimensions for better visibility
+    const maxCanvasSize = Math.min(window.innerWidth * 0.8, 800);
+    const cellSize = Math.min(maxCanvasSize / cols, maxCanvasSize / rows);
     
     canvas.width = cols * cellSize;
     canvas.height = rows * cellSize;
@@ -40,15 +41,16 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
         ctx.fillStyle = settings.faceColors[diceValue] || "#ffffff";
         ctx.fillRect(x, y, cellSize, cellSize);
         
+        // Thinner grid lines for better visibility
         ctx.strokeStyle = "#dddddd";
-        ctx.lineWidth = 0.3;
+        ctx.lineWidth = 0.2;
         ctx.strokeRect(x, y, cellSize, cellSize);
         
         if (settings.useShading) {
           drawDiceFace(ctx, diceValue, x, y, cellSize, settings.faceColors[diceValue]);
         } else {
           ctx.fillStyle = "#000000";
-          ctx.font = `${cellSize * 0.5}px Arial`;
+          ctx.font = `${cellSize * 0.4}px Arial`; // Smaller font for better readability
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(diceValue.toString(), x + cellSize / 2, y + cellSize / 2);
