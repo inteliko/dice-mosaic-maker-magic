@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MosaicSettings } from "./MosaicControls";
 import DiceCanvas from "./DiceCanvas";
 import MosaicSummary from "./MosaicSummary";
+import DiceDownloadButtons from "./DiceDownloadButtons";
 
 interface DicePreviewProps {
   diceGrid: number[][];
@@ -30,6 +31,36 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: Dic
     toast({
       title: "Download started",
       description: "Your dice mosaic image has been downloaded.",
+    });
+  };
+
+  const downloadCSV = () => {
+    const headers = ["Row", "Column", "Dice Value"];
+    const csvRows = [headers];
+
+    diceGrid.forEach((row, rowIndex) => {
+      row.forEach((value, colIndex) => {
+        csvRows.push([rowIndex + 1, colIndex + 1, value]);
+      });
+    });
+
+    const csvContent = csvRows
+      .map(row => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "dice-mosaic.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Download started",
+      description: "Your dice mosaic CSV has been downloaded.",
     });
   };
 
@@ -62,7 +93,11 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: Dic
         blackDiceCount={blackDiceCount}
         whiteDiceCount={whiteDiceCount}
         isVisible={diceGrid.length > 0}
+      />
+
+      <DiceDownloadButtons
         onDownloadImage={downloadImage}
+        onDownloadCSV={downloadCSV}
       />
     </div>
   );

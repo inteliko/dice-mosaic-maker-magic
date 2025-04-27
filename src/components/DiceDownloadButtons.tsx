@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { FileImage, FileText } from "lucide-react";
 
 interface DiceDownloadButtonsProps {
   onDownloadImage: () => void;
@@ -10,21 +9,21 @@ interface DiceDownloadButtonsProps {
 
 const DiceDownloadButtons = ({ onDownloadImage, onDownloadCSV }: DiceDownloadButtonsProps) => {
   return (
-    <div className="flex flex-wrap gap-2 mt-4 justify-center">
+    <div className="flex flex-wrap gap-4 justify-center">
       <Button 
         variant="outline"
-        className="flex items-center gap-1"
+        className="flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
         onClick={onDownloadImage}
       >
-        <Download size={16} />
+        <FileImage className="w-4 h-4" />
         Download Image
       </Button>
       <Button 
         variant="outline"
-        className="flex items-center gap-1"
+        className="flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
         onClick={onDownloadCSV}
       >
-        <Download size={16} />
+        <FileText className="w-4 h-4" />
         Download CSV
       </Button>
     </div>
