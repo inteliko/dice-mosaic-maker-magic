@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 interface ImageSliderProps {
@@ -6,7 +7,7 @@ interface ImageSliderProps {
   title?: string;
 }
 
-const ImageSlider = ({ images, title }: ImageSliderProps) => {
+export const ImageSlider = ({ images, title }: ImageSliderProps) => {
   return (
     <div className="w-full max-w-7xl mx-auto my-8">
       {title && (

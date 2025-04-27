@@ -1,5 +1,5 @@
 
-import { ImageSlider } from "@/components/ImageSlider";
+import ImageSlider from "@/components/ImageSlider";
 
 const MosaicGallery = () => {
   const exampleImages = [
