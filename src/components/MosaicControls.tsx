@@ -1,15 +1,17 @@
+
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Ruler, Weight, Move, Circle, Square } from "lucide-react";
+import { Ruler, Weight, Move, Circle, Square, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 
 interface MosaicControlsProps {
   onGenerate: (settings: MosaicSettings) => void;
   blackDiceCount?: number;
   whiteDiceCount?: number;
+  diceColorCounts?: Record<number, number>;
 }
 
 export interface MosaicSettings {
@@ -30,7 +32,7 @@ const DEFAULT_COLORS: Record<number, string> = {
 
 const DICE_SIZE_CM = 1.6;
 
-const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0 }: MosaicControlsProps) => {
+const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, diceColorCounts = {} }: MosaicControlsProps) => {
   const [gridSize, setGridSize] = useState(20);
   const [contrast, setContrast] = useState(50);
   const [useShading, setUseShading] = useState(true);
@@ -63,6 +65,16 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0 }: 
   const widthCm = gridSize * DICE_SIZE_CM;
   const heightCm = gridSize * DICE_SIZE_CM;
 
+  // Dice icons mapping
+  const DiceIcons = {
+    1: Dice1,
+    2: Dice2,
+    3: Dice3,
+    4: Dice4,
+    5: Dice5,
+    6: Dice6,
+  };
+
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm space-y-6">
       <div className="space-y-3">
@@ -79,7 +91,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0 }: 
           onValueChange={(values) => setGridSize(values[0])} 
         />
         
-        <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2 text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <Move className="w-4 h-4" />
             <span>Width: {widthCm.toFixed(1)} cm</span>
@@ -94,14 +106,36 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0 }: 
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600 border-t pt-2">
+        <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+          <h3 className="font-semibold mb-3">Dice Count by Face</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[1, 2, 3, 4, 5, 6].map(face => {
+              const DiceIcon = DiceIcons[face as keyof typeof DiceIcons];
+              return (
+                <div 
+                  key={face} 
+                  className="flex items-center gap-2 p-2 rounded-lg border" 
+                  style={{backgroundColor: faceColors[face], color: face > 3 ? "#fff" : "#000"}}
+                >
+                  <DiceIcon className="w-5 h-5" />
+                  <div className="flex flex-col">
+                    <span className="text-xs">Face {face}</span>
+                    <span className="font-bold">{diceColorCounts[face] || 0}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-4 text-sm text-gray-600 border-t pt-2">
           <div className="flex items-center gap-2">
             <Square className="w-4 h-4" />
-            <span>Black Dice: {blackDiceCount}</span>
+            <span>Black Dice (6): {blackDiceCount}</span>
           </div>
           <div className="flex items-center gap-2">
             <Circle className="w-4 h-4" />
-            <span>White Dice: {whiteDiceCount}</span>
+            <span>White Dice (1): {whiteDiceCount}</span>
           </div>
         </div>
       </div>
@@ -129,7 +163,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0 }: 
 
       <div className="space-y-3">
         <Label>Dice Face Colors</Label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {Array.from({ length: 6 }, (_, i) => i + 1).map((faceNumber) => (
             <ColorPicker
               key={faceNumber}
