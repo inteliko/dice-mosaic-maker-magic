@@ -41,13 +41,13 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: Dic
     );
   }
 
-  const width = settings.gridSize * 1.6; // 1.6 cm per dice
+  const width = settings.gridSize * 1.6;
   const height = settings.gridSize * 1.6;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col items-center p-4 border rounded-lg bg-white shadow-sm">
-        <div className="overflow-auto w-full max-h-[calc(100vh-300px)] flex items-center justify-center p-4">
+        <div className="overflow-auto max-h-[600px] w-full flex items-center justify-center p-4">
           <DiceCanvas
             diceGrid={diceGrid}
             settings={settings}
