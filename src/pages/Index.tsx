@@ -7,6 +7,7 @@ import DicePreview from "@/components/DicePreview";
 import HeroSection from "@/components/HeroSection";
 import { processImage, generateSampleGrid } from "@/utils/imageProcessor";
 import { Helmet } from "react-helmet";
+import MosaicGallery from "@/components/MosaicGallery";
 
 const Index = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -160,6 +161,8 @@ const Index = () => {
               )}
             </div>
           </div>
+
+          <MosaicGallery />
         </div>
       </main>
       
