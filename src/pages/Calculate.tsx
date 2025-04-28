@@ -1,41 +1,46 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Upload, Plus, Minus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ImageUploader from "@/components/ImageUploader";
 import { processImage } from "@/utils/imageProcessor";
+import DicePreview from "@/components/DicePreview";
+import Header from "@/components/Header";
+import { Slider } from "@/components/ui/slider";
 
 const DICE_PRICE = 0.10;
+const MAX_DICE = 10000;
 
 const Calculate = () => {
-  const [width, setWidth] = useState<number>(100);
-  const [height, setHeight] = useState<number>(100);
-  const [contrast, setContrast] = useState<number>(0);
-  const [brightness, setBrightness] = useState<number>(0);
+  const [gridSize, setGridSize] = useState<number>(20);
+  const [contrast, setContrast] = useState<number>(50);
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
+  const [blackDiceCount, setBlackDiceCount] = useState(0);
+  const [whiteDiceCount, setWhiteDiceCount] = useState(0);
   const { toast } = useToast();
 
-  const totalDice = width * height;
+  const totalDice = diceGrid.length > 0 ? diceGrid.length * diceGrid[0].length : 0;
   const totalCost = (totalDice * DICE_PRICE).toFixed(2);
-
-  const handleIncrease = (setter: (value: number) => void, current: number) => {
-    setter(current + 1);
-  };
-
-  const handleDecrease = (setter: (value: number) => void, current: number) => {
-    if (current > 0) {
-      setter(current - 1);
-    }
-  };
 
   const handleImageUpload = async (file: File) => {
     try {
-      const grid = await processImage(file, width, contrast);
+      const grid = await processImage(file, gridSize, contrast);
       setDiceGrid(grid);
+      // Count black (6) and white (1) dice
+      let black = 0;
+      let white = 0;
+      grid.forEach(row => {
+        row.forEach(value => {
+          if (value === 6) black++;
+          if (value === 1) white++;
+        });
+      });
+      setBlackDiceCount(black);
+      setWhiteDiceCount(white);
+      
       toast({
         title: "Image processed successfully",
         description: "Your image has been converted to a dice mosaic pattern.",
@@ -50,167 +55,117 @@ const Calculate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white">
+      <Header />
+      
+      <div className="container mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-center mb-8">
-          Dice mosaic generator (prepare your image to recreate it using only dice)
+          Dice Mosaic Generator
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid gap-8">
+          {/* Image Upload and Settings */}
           <Card className="p-6">
-            <h2 className="font-semibold mb-4">Image</h2>
-            <ImageUploader onImageUpload={handleImageUpload} />
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="font-semibold mb-4">Desired Size</h2>
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label>Width</Label>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleDecrease(setWidth, width)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={width}
-                    onChange={(e) => setWidth(Number(e.target.value))}
-                    className="w-24 text-center"
-                  />
-                  <span>cm</span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleIncrease(setWidth, width)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
+                <h2 className="font-semibold mb-4">Upload Image</h2>
+                <ImageUploader onImageUpload={handleImageUpload} />
               </div>
-              <div>
-                <Label>Height</Label>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleDecrease(setHeight, height)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={height}
-                    onChange={(e) => setHeight(Number(e.target.value))}
-                    className="w-24 text-center"
+              
+              <div className="space-y-6">
+                <div>
+                  <Label>Grid Size (max {MAX_DICE} dice)</Label>
+                  <Slider
+                    value={[gridSize]}
+                    onValueChange={(values) => {
+                      const newSize = values[0];
+                      if (newSize * newSize <= MAX_DICE) {
+                        setGridSize(newSize);
+                      }
+                    }}
+                    min={10}
+                    max={100}
+                    step={1}
+                    className="mt-2"
                   />
-                  <span>cm</span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleIncrease(setHeight, height)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Current size: {gridSize}x{gridSize} = {gridSize * gridSize} dice
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Contrast</Label>
+                  <Slider
+                    value={[contrast]}
+                    onValueChange={(values) => setContrast(values[0])}
+                    min={0}
+                    max={100}
+                    step={1}
+                    className="mt-2"
+                  />
                 </div>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h2 className="font-semibold mb-4">Cost Estimate (16mm)</h2>
-            <div className="space-y-4">
-              <div className="text-lg">{totalDice} Dice @</div>
-              <div className="flex items-center gap-2">
-                <span>$</span>
-                <Input
-                  type="number"
-                  value={DICE_PRICE}
-                  readOnly
-                  className="w-24 text-center"
+          {/* Preview and Results */}
+          {diceGrid.length > 0 && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="p-6">
+                <h2 className="font-semibold mb-4">Dice Preview</h2>
+                <DicePreview
+                  diceGrid={diceGrid}
+                  settings={{
+                    gridSize,
+                    contrast,
+                    useShading: true,
+                    faceColors: {
+                      1: "#FFFFFF",
+                      2: "#DDDDDD",
+                      3: "#BBBBBB",
+                      4: "#888888",
+                      5: "#555555",
+                      6: "#222222",
+                    },
+                  }}
+                  blackDiceCount={blackDiceCount}
+                  whiteDiceCount={whiteDiceCount}
                 />
-              </div>
-              <div className="text-xl font-bold">= ${totalCost}</div>
-            </div>
-          </Card>
+              </Card>
 
-          <Card className="p-6">
-            <h2 className="font-semibold mb-4">Export</h2>
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="invert" />
-                <label htmlFor="invert">Invert (black dice)</label>
-              </div>
-              <Button className="w-full">Open output</Button>
+              <Card className="p-6">
+                <h2 className="font-semibold mb-4">Dice Summary</h2>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Total Dice</Label>
+                      <div className="text-2xl font-bold">{totalDice}</div>
+                    </div>
+                    <div>
+                      <Label>Total Cost</Label>
+                      <div className="text-2xl font-bold">${totalCost}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Black Dice (6)</Label>
+                      <div className="text-xl">{blackDiceCount}</div>
+                    </div>
+                    <div>
+                      <Label>White Dice (1)</Label>
+                      <div className="text-xl">{whiteDiceCount}</div>
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-gray-500">
+                    Price per die: ${DICE_PRICE.toFixed(2)}
+                  </div>
+                </div>
+              </Card>
             </div>
-          </Card>
+          )}
         </div>
-
-        <Card className="mb-8">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Setting</TableHead>
-                <TableHead>Controls</TableHead>
-                <TableHead>Value</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Contrast</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => handleDecrease(setContrast, contrast)}
-                    >
-                      - Decrease
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleIncrease(setContrast, contrast)}
-                    >
-                      + Increase
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>{contrast}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Brightness</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => handleDecrease(setBrightness, brightness)}
-                    >
-                      - Decrease
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleIncrease(setBrightness, brightness)}
-                    >
-                      + Increase
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>{brightness}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-bold mb-4">How to Use</h2>
-          <ol className="list-decimal pl-6 space-y-2">
-            <li>Upload your image</li>
-            <li>Adjust size, contrast, and brightness</li>
-            <li>Open output for a printable list of dice numbers</li>
-          </ol>
-        </Card>
       </div>
     </div>
   );
