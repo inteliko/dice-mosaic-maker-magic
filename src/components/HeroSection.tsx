@@ -34,7 +34,7 @@ const HeroSection = () => {
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
 
-    // Dice creation function with all faces
+    // Dice creation function with slower movement
     const createDice = () => {
       const diceSize = 2;
       const geometry = new THREE.BoxGeometry(diceSize, diceSize, diceSize);
@@ -100,11 +100,11 @@ const HeroSection = () => {
           break;
       }
       
-      // Random position and rotation with slower fall speed
+      // Much slower initial position spread
       dice.position.set(
-        Math.random() * 20 - 10,
-        Math.random() * 20 - 10,
-        Math.random() * 10 - 20
+        Math.random() * 16 - 8,  // Reduced spread
+        Math.random() * 16 - 8,
+        Math.random() * 8 - 16
       );
       
       dice.rotation.set(
@@ -113,25 +113,25 @@ const HeroSection = () => {
         Math.random() * Math.PI
       );
       
-      // Slower rotation velocity
+      // Much slower rotation velocity
       const rotVel = {
-        x: Math.random() * 0.02 - 0.01,
-        y: Math.random() * 0.02 - 0.01,
-        z: Math.random() * 0.02 - 0.01
+        x: (Math.random() * 0.005 - 0.0025), // 4x slower
+        y: (Math.random() * 0.005 - 0.0025),
+        z: (Math.random() * 0.005 - 0.0025)
       };
       
-      // Slower vertical movement
+      // Much slower movement velocity
       const vel = {
-        x: Math.random() * 0.03 - 0.015,
-        y: Math.random() * 0.03 - 0.015,
-        z: Math.random() * 0.1 + 0.05 // Slower movement toward camera
+        x: (Math.random() * 0.008 - 0.004), // 4x slower
+        y: (Math.random() * 0.008 - 0.004),
+        z: Math.random() * 0.02 + 0.01 // Slower movement toward camera
       };
       
       return { mesh: dice, rotVel, vel };
     };
     
-    // Create more dice for a fuller effect
-    const diceObjects = Array.from({ length: 30 }, () => createDice());
+    // Create fewer dice for a cleaner look
+    const diceObjects = Array.from({ length: 25 }, () => createDice());
     diceObjects.forEach(dice => scene.add(dice.mesh));
     
     // Animation loop
@@ -139,12 +139,12 @@ const HeroSection = () => {
       requestAnimationFrame(animate);
       
       diceObjects.forEach(dice => {
-        // Rotate dice
+        // Apply slower rotation
         dice.mesh.rotation.x += dice.rotVel.x;
         dice.mesh.rotation.y += dice.rotVel.y;
         dice.mesh.rotation.z += dice.rotVel.z;
         
-        // Move dice
+        // Apply slower movement
         dice.mesh.position.x += dice.vel.x;
         dice.mesh.position.y += dice.vel.y;
         dice.mesh.position.z += dice.vel.z;
@@ -152,8 +152,8 @@ const HeroSection = () => {
         // Reset position if dice goes out of view
         if (dice.mesh.position.z > 10) {
           dice.mesh.position.z = -20;
-          dice.mesh.position.x = Math.random() * 20 - 10;
-          dice.mesh.position.y = Math.random() * 20 - 10;
+          dice.mesh.position.x = Math.random() * 16 - 8; // Reduced spread
+          dice.mesh.position.y = Math.random() * 16 - 8;
         }
       });
       
