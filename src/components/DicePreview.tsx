@@ -40,7 +40,7 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: Dic
 
     diceGrid.forEach((row, rowIndex) => {
       row.forEach((value, colIndex) => {
-        csvRows.push([rowIndex + 1, colIndex + 1, value]);
+        csvRows.push([String(rowIndex + 1), String(colIndex + 1), String(value)]);
       });
     });
 
@@ -93,6 +93,7 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: Dic
         blackDiceCount={blackDiceCount}
         whiteDiceCount={whiteDiceCount}
         isVisible={diceGrid.length > 0}
+        onDownloadImage={downloadImage}
       />
 
       <DiceDownloadButtons
