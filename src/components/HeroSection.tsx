@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Button } from "@/components/ui/button";
@@ -35,7 +34,7 @@ const HeroSection = () => {
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
 
-    // Dice creation function
+    // Dice creation function with all faces
     const createDice = () => {
       const diceSize = 2;
       const geometry = new THREE.BoxGeometry(diceSize, diceSize, diceSize);
@@ -47,7 +46,7 @@ const HeroSection = () => {
       
       const dice = new THREE.Mesh(geometry, material);
       
-      // Add dice dots (simple version)
+      // Add dice dots (all faces)
       const addDot = (x: number, y: number, z: number) => {
         const dotGeo = new THREE.SphereGeometry(0.2, 16, 16);
         const dotMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
@@ -56,11 +55,52 @@ const HeroSection = () => {
         dice.add(dot);
       };
       
-      // Position dots for a standard dice
-      // Face 1
-      addDot(0, -diceSize/2 - 0.01, 0); // Center dot
+      // Randomly select a dice face (1-6)
+      const diceFace = Math.floor(Math.random() * 6) + 1;
       
-      // Random position and rotation
+      switch(diceFace) {
+        case 1:
+          // Center dot
+          addDot(0, -diceSize/2 - 0.01, 0);
+          break;
+        case 2:
+          // Two diagonal dots
+          addDot(-diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          break;
+        case 3:
+          // Three diagonal dots
+          addDot(-diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(0, -diceSize/2 - 0.01, 0);
+          addDot(diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          break;
+        case 4:
+          // Four corner dots
+          addDot(-diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(-diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          addDot(diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          break;
+        case 5:
+          // Four corner dots + center
+          addDot(-diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(-diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          addDot(0, -diceSize/2 - 0.01, 0);
+          addDot(diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          break;
+        case 6:
+          // Six dots in two rows
+          addDot(-diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(-diceSize/4, -diceSize/2 - 0.01, 0);
+          addDot(-diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          addDot(diceSize/4, -diceSize/2 - 0.01, -diceSize/4);
+          addDot(diceSize/4, -diceSize/2 - 0.01, 0);
+          addDot(diceSize/4, -diceSize/2 - 0.01, diceSize/4);
+          break;
+      }
+      
+      // Random position and rotation with slower fall speed
       dice.position.set(
         Math.random() * 20 - 10,
         Math.random() * 20 - 10,
@@ -73,24 +113,25 @@ const HeroSection = () => {
         Math.random() * Math.PI
       );
       
-      // Random rotation velocity
+      // Slower rotation velocity
       const rotVel = {
-        x: Math.random() * 0.05 - 0.025,
-        y: Math.random() * 0.05 - 0.025,
-        z: Math.random() * 0.05 - 0.025
+        x: Math.random() * 0.02 - 0.01,
+        y: Math.random() * 0.02 - 0.01,
+        z: Math.random() * 0.02 - 0.01
       };
       
+      // Slower vertical movement
       const vel = {
-        x: Math.random() * 0.05 - 0.025,
-        y: Math.random() * 0.05 - 0.025,
-        z: Math.random() * 0.2 + 0.1 // Mostly coming toward camera
+        x: Math.random() * 0.03 - 0.015,
+        y: Math.random() * 0.03 - 0.015,
+        z: Math.random() * 0.1 + 0.05 // Slower movement toward camera
       };
       
       return { mesh: dice, rotVel, vel };
     };
     
-    // Create multiple dice
-    const diceObjects = Array.from({ length: 15 }, () => createDice());
+    // Create more dice for a fuller effect
+    const diceObjects = Array.from({ length: 30 }, () => createDice());
     diceObjects.forEach(dice => scene.add(dice.mesh));
     
     // Animation loop
