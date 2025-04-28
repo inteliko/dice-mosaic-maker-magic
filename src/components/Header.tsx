@@ -34,7 +34,15 @@ const Header = () => {
                 to="/" 
                 className={`transition-colors hover:text-dice-primary ${isActive('/') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
               >
-                Create
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/calculate" 
+                className={`transition-colors hover:text-dice-primary ${isActive('/calculate') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
+              >
+                Calculate
               </Link>
             </li>
             <li>
@@ -72,7 +80,16 @@ const Header = () => {
                   className={`block px-4 py-2 transition-colors hover:bg-gray-100 rounded-md ${isActive('/') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Create
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/calculate" 
+                  className={`block px-4 py-2 transition-colors hover:bg-gray-100 rounded-md ${isActive('/calculate') ? 'text-dice-primary font-medium' : 'text-gray-600'}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Calculate
                 </Link>
               </li>
               <li>

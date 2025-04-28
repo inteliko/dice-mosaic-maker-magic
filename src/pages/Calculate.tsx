@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Upload, Plus, Minus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import ImageUploader from "@/components/ImageUploader";
+import { processImage } from "@/utils/imageProcessor";
 
 const DICE_PRICE = 0.10;
 
@@ -14,6 +16,8 @@ const Calculate = () => {
   const [height, setHeight] = useState<number>(100);
   const [contrast, setContrast] = useState<number>(0);
   const [brightness, setBrightness] = useState<number>(0);
+  const [diceGrid, setDiceGrid] = useState<number[][]>([]);
+  const { toast } = useToast();
 
   const totalDice = width * height;
   const totalCost = (totalDice * DICE_PRICE).toFixed(2);
@@ -28,6 +32,23 @@ const Calculate = () => {
     }
   };
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      const grid = await processImage(file, width, contrast);
+      setDiceGrid(grid);
+      toast({
+        title: "Image processed successfully",
+        description: "Your image has been converted to a dice mosaic pattern.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error processing image",
+        description: "There was an error processing your image. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white py-12">
       <div className="container mx-auto px-4">
@@ -38,10 +59,7 @@ const Calculate = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="p-6">
             <h2 className="font-semibold mb-4">Image</h2>
-            <Button className="w-full gap-2">
-              <Upload className="h-4 w-4" />
-              Upload Image
-            </Button>
+            <ImageUploader onImageUpload={handleImageUpload} />
           </Card>
 
           <Card className="p-6">
