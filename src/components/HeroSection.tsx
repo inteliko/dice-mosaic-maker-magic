@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ const HeroSection = () => {
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
 
-    // Dice creation function with slower movement
+    // Dice creation function with smoother movement
     const createDice = () => {
       const diceSize = 2;
       const geometry = new THREE.BoxGeometry(diceSize, diceSize, diceSize);
@@ -100,11 +101,13 @@ const HeroSection = () => {
           break;
       }
       
-      // Much slower initial position spread
+      // Position dice at the top of the viewport with full width distribution
+      const viewportWidth = 30; // Adjust based on camera FOV
+      
       dice.position.set(
-        Math.random() * 16 - 8,  // Reduced spread
-        Math.random() * 16 - 8,
-        Math.random() * 8 - 16
+        Math.random() * viewportWidth - (viewportWidth / 2), // Spread across full width
+        15, // Start from above the visible area
+        Math.random() * 8 - 16 // Varied depth
       );
       
       dice.rotation.set(
@@ -113,25 +116,25 @@ const HeroSection = () => {
         Math.random() * Math.PI
       );
       
-      // Much slower rotation velocity
+      // Smooth rotation velocity
       const rotVel = {
-        x: (Math.random() * 0.005 - 0.0025), // 4x slower
-        y: (Math.random() * 0.005 - 0.0025),
-        z: (Math.random() * 0.005 - 0.0025)
+        x: (Math.random() * 0.01 - 0.005), 
+        y: (Math.random() * 0.01 - 0.005),
+        z: (Math.random() * 0.01 - 0.005)
       };
       
-      // Much slower movement velocity
+      // Smooth falling movement
       const vel = {
-        x: (Math.random() * 0.008 - 0.004), // 4x slower
-        y: (Math.random() * 0.008 - 0.004),
-        z: Math.random() * 0.02 + 0.01 // Slower movement toward camera
+        x: (Math.random() * 0.01 - 0.005), 
+        y: -Math.random() * 0.05 - 0.02, // Downward movement (falling)
+        z: Math.random() * 0.01 + 0.005 // Slow movement toward camera
       };
       
       return { mesh: dice, rotVel, vel };
     };
     
-    // Create fewer dice for a cleaner look
-    const diceObjects = Array.from({ length: 25 }, () => createDice());
+    // Create dice for a clean look
+    const diceObjects = Array.from({ length: 30 }, () => createDice());
     diceObjects.forEach(dice => scene.add(dice.mesh));
     
     // Animation loop
@@ -139,21 +142,30 @@ const HeroSection = () => {
       requestAnimationFrame(animate);
       
       diceObjects.forEach(dice => {
-        // Apply slower rotation
+        // Apply rotation
         dice.mesh.rotation.x += dice.rotVel.x;
         dice.mesh.rotation.y += dice.rotVel.y;
         dice.mesh.rotation.z += dice.rotVel.z;
         
-        // Apply slower movement
+        // Apply movement
         dice.mesh.position.x += dice.vel.x;
         dice.mesh.position.y += dice.vel.y;
         dice.mesh.position.z += dice.vel.z;
         
-        // Reset position if dice goes out of view
-        if (dice.mesh.position.z > 10) {
-          dice.mesh.position.z = -20;
-          dice.mesh.position.x = Math.random() * 16 - 8; // Reduced spread
-          dice.mesh.position.y = Math.random() * 16 - 8;
+        // Reset position if dice goes out of view (bottom of screen)
+        if (dice.mesh.position.y < -15) {
+          // Reset to top of screen with new random x position
+          dice.mesh.position.y = 15;
+          const viewportWidth = 30;
+          dice.mesh.position.x = Math.random() * viewportWidth - (viewportWidth / 2);
+          dice.mesh.position.z = Math.random() * 8 - 16;
+          
+          // Reset rotation
+          dice.mesh.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+          );
         }
       });
       
