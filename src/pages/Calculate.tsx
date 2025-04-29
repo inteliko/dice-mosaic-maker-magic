@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,8 @@ import ImageUploader from "@/components/ImageUploader";
 import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
 import { FileDown, Plus, Minus } from "lucide-react";
+import DicePreview from "@/components/DicePreview";
+import MosaicControls, { MosaicSettings } from "@/components/MosaicControls";
 
 const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
@@ -22,12 +25,44 @@ const Calculate = () => {
   const [invertColors, setInvertColors] = useState<boolean>(false);
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [diceCount, setDiceCount] = useState<number>(0);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [settings, setSettings] = useState<MosaicSettings>({
+    gridSize: DEFAULT_SIZE,
+    contrast: 50,
+    useShading: true,
+    faceColors: {
+      1: "#FFFFFF",
+      2: "#DDDDDD",
+      3: "#BBBBBB",
+      4: "#888888",
+      5: "#555555",
+      6: "#222222",
+    }
+  });
   const { toast } = useToast();
+
+  // Calculate counts of each dice face
+  const diceColorCounts = diceGrid.reduce((acc, row) => {
+    row.forEach(value => {
+      acc[value] = (acc[value] || 0) + 1;
+    });
+    return acc;
+  }, {} as Record<number, number>);
+
+  // Count black and white dice (faces 1 and 6)
+  const whiteDiceCount = diceColorCounts[1] || 0;
+  const blackDiceCount = diceColorCounts[6] || 0;
 
   const totalCost = (diceCount * DICE_PRICE).toFixed(2);
 
   const handleImageUpload = async (file: File) => {
     try {
+      setIsProcessing(true);
+      toast({
+        title: "Processing image",
+        description: "Please wait while we convert your image to dice...",
+      });
+      
       // Calculate grid size based on width/height
       const gridSize = Math.max(width, height);
       
@@ -37,6 +72,12 @@ const Calculate = () => {
       // Count dice
       const totalDice = grid.length * grid[0].length;
       setDiceCount(totalDice);
+      
+      setSettings(prev => ({
+        ...prev,
+        gridSize,
+        contrast,
+      }));
       
       toast({
         title: "Image processed successfully",
@@ -48,7 +89,21 @@ const Calculate = () => {
         description: "There was an error processing your image. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
+  };
+
+  const handleGenerateMosaic = (newSettings: MosaicSettings) => {
+    setSettings(newSettings);
+    // For this simplified version, we'll just update the counts
+    const totalDice = newSettings.gridSize * newSettings.gridSize;
+    setDiceCount(totalDice);
+    
+    toast({
+      title: "Settings updated",
+      description: "Mosaic settings have been updated.",
+    });
   };
 
   const increaseSize = () => {
@@ -86,7 +141,6 @@ const Calculate = () => {
   };
 
   const openOutput = () => {
-    // This would be implemented to show the dice layout output
     toast({
       title: "Opening output",
       description: "Preparing dice layout for printing...",
@@ -114,6 +168,7 @@ const Calculate = () => {
                   variant="default" 
                   className="bg-blue-500 hover:bg-blue-600 text-white mb-4 w-full"
                   onClick={() => document.getElementById('imageUploader')?.click()}
+                  disabled={isProcessing}
                 >
                   Upload Image
                 </Button>
@@ -211,6 +266,7 @@ const Calculate = () => {
                   variant="default" 
                   className="bg-blue-500 hover:bg-blue-600 text-white w-full"
                   onClick={openOutput}
+                  disabled={diceGrid.length === 0}
                 >
                   Open output
                 </Button>
@@ -288,14 +344,30 @@ const Calculate = () => {
           </Card>
           
           {/* Preview Area */}
-          <div className="h-64 bg-gray-200 bg-opacity-50 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8L3N2Zz4=')]">
-            {/* Dice preview would appear here */}
-            {diceGrid.length > 0 && (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-sm text-gray-500">Dice mosaic generated. Click "Open output" to view.</p>
+          <div className={`bg-gray-200 bg-opacity-50 p-4 rounded-lg ${diceGrid.length === 0 ? 'h-64' : ''}`}>
+            {diceGrid.length === 0 ? (
+              <div className="h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8L3N2Zz4=')] flex items-center justify-center">
+                <p className="text-sm text-gray-500">Upload an image and generate a dice mosaic to see the preview</p>
               </div>
+            ) : (
+              <DicePreview 
+                diceGrid={diceGrid} 
+                settings={settings}
+                blackDiceCount={blackDiceCount}
+                whiteDiceCount={whiteDiceCount}
+              />
             )}
           </div>
+          
+          {/* Advanced Controls */}
+          {diceGrid.length > 0 && (
+            <MosaicControls 
+              onGenerate={handleGenerateMosaic}
+              blackDiceCount={blackDiceCount}
+              whiteDiceCount={whiteDiceCount}
+              diceColorCounts={diceColorCounts}
+            />
+          )}
           
           {/* Instructions */}
           <Card className="border-gray-200 p-6">
