@@ -6,9 +6,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface ImageUploaderProps {
   onImageUpload: (imageFile: File) => void;
+  id?: string;
 }
 
-const ImageUploader = ({ onImageUpload }: ImageUploaderProps) => {
+const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +126,7 @@ const ImageUploader = ({ onImageUpload }: ImageUploaderProps) => {
         onChange={handleFileChange}
         accept=".jpg,.jpeg,.png"
         className="hidden"
+        id={id}
       />
     </div>
   );
