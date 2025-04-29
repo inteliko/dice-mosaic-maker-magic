@@ -47,15 +47,29 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
     onImageUpload(file);
   };
 
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
-    <input
-      type="file"
-      ref={fileInputRef}
-      onChange={handleFileChange}
-      accept=".jpg,.jpeg,.png"
-      className="hidden"
-      id={id}
-    />
+    <div className="flex flex-col items-center gap-2">
+      <Button 
+        onClick={handleButtonClick}
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+      >
+        Upload Image
+      </Button>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".jpg,.jpeg,.png"
+        className="hidden"
+        id={id}
+      />
+    </div>
   );
 };
 
