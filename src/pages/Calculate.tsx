@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ImageUploader from "@/components/ImageUploader";
 import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
-import { FileArrowDown, Plus, Minus } from "lucide-react";
+import { FileDown, Plus, Minus } from "lucide-react";
 
 const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
