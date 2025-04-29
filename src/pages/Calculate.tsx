@@ -11,6 +11,7 @@ import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
 import { FileDown, Plus, Minus } from "lucide-react";
 import DicePreview from "@/components/DicePreview";
+import DiceCanvas from "@/components/DiceCanvas"; // Added this import
 
 const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
