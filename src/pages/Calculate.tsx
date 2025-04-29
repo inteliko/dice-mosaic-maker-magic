@@ -11,7 +11,6 @@ import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
 import { FileDown, Plus, Minus } from "lucide-react";
 import DicePreview from "@/components/DicePreview";
-import MosaicControls, { MosaicSettings } from "@/components/MosaicControls";
 
 const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
@@ -26,7 +25,7 @@ const Calculate = () => {
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [diceCount, setDiceCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [settings, setSettings] = useState<MosaicSettings>({
+  const [settings, setSettings] = useState({
     gridSize: DEFAULT_SIZE,
     contrast: 50,
     useShading: true,
@@ -94,18 +93,6 @@ const Calculate = () => {
     }
   };
 
-  const handleGenerateMosaic = (newSettings: MosaicSettings) => {
-    setSettings(newSettings);
-    // For this simplified version, we'll just update the counts
-    const totalDice = newSettings.gridSize * newSettings.gridSize;
-    setDiceCount(totalDice);
-    
-    toast({
-      title: "Settings updated",
-      description: "Mosaic settings have been updated.",
-    });
-  };
-
   const increaseSize = () => {
     if (width * height < MAX_DICE) {
       setWidth(prev => Math.min(prev + 10, 100));
@@ -156,17 +143,16 @@ const Calculate = () => {
           Dice mosaic generator (prepare your image to recreate it using only dice)
         </h1>
 
-        {/* Main Controls */}
-        <div className="grid grid-cols-1 gap-4 max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Top Section: Image, Size, Cost, Export */}
-          <Card className="border-gray-200">
-            <div className="grid grid-cols-4 divide-x">
+          <Card className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x">
               {/* Image Upload */}
-              <div className="p-4 flex flex-col items-center justify-center">
-                <Label className="text-lg font-medium mb-4 text-center">Image</Label>
+              <div className="p-4">
+                <Label className="text-lg font-medium mb-4 block">Image</Label>
                 <Button 
                   variant="default" 
-                  className="bg-blue-500 hover:bg-blue-600 text-white mb-4 w-full"
+                  className="bg-blue-500 hover:bg-blue-600 text-white w-full"
                   onClick={() => document.getElementById('imageUploader')?.click()}
                   disabled={isProcessing}
                 >
@@ -264,7 +250,7 @@ const Calculate = () => {
                 
                 <Button 
                   variant="default" 
-                  className="bg-blue-500 hover:bg-blue-600 text-white w-full"
+                  className="bg-blue-300 hover:bg-blue-400 text-white w-full"
                   onClick={openOutput}
                   disabled={diceGrid.length === 0}
                 >
@@ -275,8 +261,8 @@ const Calculate = () => {
           </Card>
           
           {/* Middle Section: Contrast and Brightness Controls */}
-          <Card className="border-gray-200">
-            <div className="grid grid-cols-2 divide-x">
+          <Card className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
               {/* Contrast Control */}
               <div className="p-4">
                 <Label className="text-lg font-medium mb-4 block">Contrast</Label>
@@ -344,9 +330,9 @@ const Calculate = () => {
           </Card>
           
           {/* Preview Area */}
-          <div className={`bg-gray-200 bg-opacity-50 p-4 rounded-lg ${diceGrid.length === 0 ? 'h-64' : ''}`}>
+          <div className="mb-4">
             {diceGrid.length === 0 ? (
-              <div className="h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8L3N2Zz4=')] flex items-center justify-center">
+              <div className="h-64 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2RkZCIvPgo8L3N2Zz4=')] flex items-center justify-center rounded-lg">
                 <p className="text-sm text-gray-500">Upload an image and generate a dice mosaic to see the preview</p>
               </div>
             ) : (
@@ -359,18 +345,8 @@ const Calculate = () => {
             )}
           </div>
           
-          {/* Advanced Controls */}
-          {diceGrid.length > 0 && (
-            <MosaicControls 
-              onGenerate={handleGenerateMosaic}
-              blackDiceCount={blackDiceCount}
-              whiteDiceCount={whiteDiceCount}
-              diceColorCounts={diceColorCounts}
-            />
-          )}
-          
           {/* Instructions */}
-          <Card className="border-gray-200 p-6">
+          <Card className="p-6 mb-4">
             <h2 className="text-xl font-bold mb-4">How to Use</h2>
             <ol className="list-decimal pl-5 space-y-2">
               <li>Upload your image</li>
