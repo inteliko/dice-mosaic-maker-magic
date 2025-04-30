@@ -3,7 +3,7 @@ import React from 'react';
 import AutoScrollingImageRow from '@/components/AutoScrollingImageRow';
 
 const MosaicGallery = () => {
-  // First row images (scrolling left to right)
+  // First row images (scrolling right to left)
   const firstRowImages = [
     "https://images.unsplash.com/photo-1518770660439-4636190af475",
     "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
@@ -15,7 +15,7 @@ const MosaicGallery = () => {
     "https://images.unsplash.com/photo-1531297484001-80022131f5a1"
   ];
 
-  // Second row images (scrolling right to left)
+  // Second row images (scrolling right to left as well)
   const secondRowImages = [
     "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
     "https://images.unsplash.com/photo-1500673922987-e212871fec22",
@@ -36,7 +36,7 @@ const MosaicGallery = () => {
       <div className="py-4">
         <AutoScrollingImageRow 
           images={firstRowImages} 
-          direction="left" 
+          direction="right" 
           speed={30}
         />
       </div>
