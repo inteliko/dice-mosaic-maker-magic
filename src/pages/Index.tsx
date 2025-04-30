@@ -1,4 +1,6 @@
+
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ImageUploader from "@/components/ImageUploader";
@@ -11,15 +13,74 @@ import MosaicGallery from "@/components/MosaicGallery";
 
 const Index = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [settings, setSettings] = useState<MosaicSettings | null>(null);
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [blackDiceCount, setBlackDiceCount] = useState(0);
   const [whiteDiceCount, setWhiteDiceCount] = useState(0);
   const [diceColorCounts, setDiceColorCounts] = useState<Record<number, number>>({});
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we have a preset image from navigation state
+    if (location.state && (location.state as any).presetImageUrl) {
+      const presetUrl = (location.state as any).presetImageUrl;
+      setImageUrl(presetUrl);
+      processPresetImage(presetUrl);
+    }
+  }, [location.state]);
+
+  const processPresetImage = async (url: string) => {
+    setIsProcessing(true);
+    try {
+      // Fetch the image from URL
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const file = new File([blob], "preset-image.jpg", { type: blob.type });
+      
+      setImageFile(file);
+      
+      // Generate mosaic with default settings
+      const defaultSettings = {
+        gridSize: 20,
+        contrast: 50,
+        useShading: true,
+        faceColors: {
+          1: "#FFFFFF",
+          2: "#DDDDDD",
+          3: "#BBBBBB",
+          4: "#888888",
+          5: "#555555",
+          6: "#222222",
+        }
+      };
+      
+      const grid = await processImage(
+        file, 
+        defaultSettings.gridSize,
+        defaultSettings.contrast
+      );
+      
+      setDiceGrid(grid);
+      setSettings(defaultSettings);
+      
+      const counts = countDiceColors(grid, defaultSettings.faceColors);
+      setBlackDiceCount(counts.black);
+      setWhiteDiceCount(counts.white);
+      setDiceColorCounts(counts.byFace);
+      
+      localStorage.setItem("diceMosaicGrid", JSON.stringify(grid));
+    } catch (error) {
+      console.error("Error processing preset image:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handleImageUpload = (file: File) => {
     setImageFile(file);
+    setImageUrl(null);
     setDiceGrid([]);
     setBlackDiceCount(0);
     setWhiteDiceCount(0);
@@ -120,6 +181,18 @@ const Index = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
               <h2 className="text-xl font-semibold mb-4 text-purple-800">1. Upload Your Image</h2>
               <ImageUploader onImageUpload={handleImageUpload} />
+              {imageUrl && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500 mb-2">Using preset image:</p>
+                  <div className="w-full max-w-xs mx-auto">
+                    <img 
+                      src={imageUrl} 
+                      alt="Selected preset" 
+                      className="w-full h-auto rounded-lg border border-gray-200"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
