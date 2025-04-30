@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
+import { Sparkles, Rocket } from 'lucide-react';
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,7 +45,7 @@ const HeroSection = () => {
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x6854b3); // Matches dice-primary color
+    scene.background = new THREE.Color(0x7954c4); // Slightly deeper purple for more professional look
 
     // Camera setup
     const camera = new THREE.PerspectiveCamera(
@@ -56,39 +57,55 @@ const HeroSection = () => {
     camera.position.z = 20;
 
     // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     containerRef.current.appendChild(renderer.domElement);
 
-    // Lighting setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Improved lighting for more professional look
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
+
+    // Add a subtle spotlight for dramatic effect
+    const spotlight = new THREE.SpotLight(0xffffff, 0.8);
+    spotlight.position.set(0, 15, 15);
+    spotlight.angle = Math.PI / 6;
+    spotlight.penumbra = 0.2;
+    scene.add(spotlight);
 
     // Calculate the visible width at camera z-position for full width distribution
     const vFOV = THREE.MathUtils.degToRad(camera.fov);
     const visibleHeight = 2 * Math.tan(vFOV / 2) * Math.abs(camera.position.z);
     const visibleWidth = visibleHeight * camera.aspect;
 
+    // Create an array to hold all dice objects
+    const diceObjects: { mesh: THREE.Mesh; rotVel: {x: number, y: number, z: number}; vel: {x: number, y: number, z: number} }[] = [];
+    
     // Dice creation function with wider distribution
     const createDice = () => {
       const diceSize = 2;
       const geometry = new THREE.BoxGeometry(diceSize, diceSize, diceSize);
+      
+      // More professional materials with subtle shine
       const material = new THREE.MeshStandardMaterial({ 
         color: 0xffffff,
-        roughness: 0.2,
-        metalness: 0.1,
+        roughness: 0.1,
+        metalness: 0.2,
       });
       
       const dice = new THREE.Mesh(geometry, material);
       
       // Add dice dots (all faces)
       const addDot = (x: number, y: number, z: number) => {
-        const dotGeo = new THREE.SphereGeometry(0.2, 16, 16);
-        const dotMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+        const dotGeo = new THREE.SphereGeometry(0.18, 16, 16);
+        const dotMat = new THREE.MeshStandardMaterial({ 
+          color: 0x222222,
+          roughness: 0.3,
+          metalness: 0.1
+        });
         const dot = new THREE.Mesh(dotGeo, dotMat);
         dot.position.set(x, y, z);
         dice.add(dot);
@@ -154,24 +171,44 @@ const HeroSection = () => {
       
       // Randomized rotation velocity for more natural movement
       const rotVel = {
-        x: (Math.random() * 0.03 - 0.015), 
-        y: (Math.random() * 0.03 - 0.015),
-        z: (Math.random() * 0.03 - 0.015)
+        x: (Math.random() * 0.025 - 0.0125), 
+        y: (Math.random() * 0.025 - 0.0125),
+        z: (Math.random() * 0.025 - 0.0125)
       };
       
       // Randomized falling speed
       const vel = {
-        x: (Math.random() * 0.02 - 0.01), // Small horizontal drift
-        y: -Math.random() * 0.1 - 0.05, // Varied falling speeds
-        z: Math.random() * 0.02 - 0.01 // Small z-axis drift
+        x: (Math.random() * 0.015 - 0.0075), // Small horizontal drift
+        y: -Math.random() * 0.08 - 0.04, // Varied falling speeds (slightly slower)
+        z: Math.random() * 0.015 - 0.0075 // Small z-axis drift
       };
       
       return { mesh: dice, rotVel, vel };
     };
     
-    // Create more dice for a fuller effect
-    const diceObjects = Array.from({ length: 50 }, () => createDice());
-    diceObjects.forEach(dice => scene.add(dice.mesh));
+    // Spawn dice with delay between each
+    let diceCount = 0;
+    const maxDice = 30; // Reduced from 50 to 30 dice
+    
+    // Initial set of dice (just a few to start)
+    for (let i = 0; i < 10; i++) {
+      const dice = createDice();
+      scene.add(dice.mesh);
+      diceObjects.push(dice);
+      diceCount++;
+    }
+    
+    // Create a spawn interval for the rest of the dice
+    const spawnInterval = setInterval(() => {
+      if (diceCount < maxDice) {
+        const dice = createDice();
+        scene.add(dice.mesh);
+        diceObjects.push(dice);
+        diceCount++;
+      } else {
+        clearInterval(spawnInterval);
+      }
+    }, 300); // Spawn a new dice every 300ms
     
     // Animation loop
     const animate = () => {
@@ -203,9 +240,9 @@ const HeroSection = () => {
           );
           
           // New random velocities for variation
-          dice.vel.y = -Math.random() * 0.1 - 0.05;
-          dice.vel.x = (Math.random() * 0.02 - 0.01);
-          dice.vel.z = Math.random() * 0.02 - 0.01;
+          dice.vel.y = -Math.random() * 0.08 - 0.04; // Slightly slower fall
+          dice.vel.x = (Math.random() * 0.015 - 0.0075);
+          dice.vel.z = Math.random() * 0.015 - 0.0075;
         }
       });
       
@@ -242,60 +279,88 @@ const HeroSection = () => {
     
     // Cleanup
     return () => {
+      clearInterval(spawnInterval);
       if (containerRef.current && containerRef.current.contains(renderer.domElement)) {
         containerRef.current.removeChild(renderer.domElement);
       }
       window.removeEventListener('resize', handleResize);
+      
+      // Dispose of Three.js objects
+      diceObjects.forEach(dice => {
+        scene.remove(dice.mesh);
+        (dice.mesh.geometry as THREE.BufferGeometry).dispose();
+        (dice.mesh.material as THREE.Material).dispose();
+      });
     };
   }, []);
 
   return (
-    <div className="relative w-full h-[80vh] overflow-hidden bg-gradient-to-br from-dice-primary to-dice-secondary">
+    <div className="relative w-full h-[80vh] overflow-hidden bg-gradient-to-br from-purple-700 to-purple-900">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDMiPjwvcmVjdD4KPC9zdmc+')] opacity-30"></div>
       <div ref={containerRef} className="absolute inset-0" />
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 z-10">
-        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-          Turn Images Into <br />
-          <span className="text-yellow-200">Dice Mosaics</span>
-        </h1>
-        <p className="text-xl md:text-2xl text-white/90 max-w-2xl mb-8">
-          Create stunning artwork using nothing but dice. 
-          Upload an image and transform it into a unique dice mosaic.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <Button size="lg" onClick={handleGetStarted} className="bg-white text-dice-primary hover:bg-yellow-100 rounded-full px-8 py-6">
-            Get Started
-          </Button>
-          <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10 rounded-full px-8 py-6">
-            Learn More
-          </Button>
+        <div className="animate-fade-in">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
+            Transform Images Into <br />
+            <span className="bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-100 bg-clip-text text-transparent drop-shadow-sm">Dice Mosaics</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed">
+            Create stunning artwork using nothing but dice. 
+            Upload an image and transform it into a unique dice mosaic.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 mb-10 justify-center">
+            <Button 
+              size="lg" 
+              onClick={handleGetStarted} 
+              className="bg-white text-purple-800 hover:bg-yellow-100 rounded-full px-8 py-6 font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <Rocket className="mr-2 h-5 w-5" />
+              Get Started
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="bg-transparent border-2 border-white text-white hover:bg-white/10 rounded-full px-8 py-6 font-medium shadow-lg transition-all duration-300"
+            >
+              <Sparkles className="mr-2 h-5 w-5" />
+              Learn More
+            </Button>
+          </div>
         </div>
         
-        {/* Preset images section */}
-        <div className="w-full max-w-3xl">
-          <h3 className="text-white text-lg mb-4">Or select one of our preset images</h3>
+        {/* Preset images section with enhanced styling */}
+        <div className="w-full max-w-3xl animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <h3 className="text-white text-lg mb-4 font-medium">Or select one of our preset images</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {presetImages.map((preset, index) => (
               <div 
                 key={index}
-                className={`rounded-lg overflow-hidden cursor-pointer transition-all transform hover:scale-105 ${
+                className={`rounded-xl overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${
                   selectedPreset === preset.url ? 'ring-4 ring-yellow-300' : ''
                 }`}
                 onClick={() => handlePresetSelect(preset.url)}
               >
-                <img 
-                  src={preset.thumbnail} 
-                  alt={preset.name}
-                  className="w-full h-32 object-cover"
-                />
-                <div className="bg-black/70 p-2">
-                  <p className="text-white text-sm">{preset.name}</p>
+                <div className="relative">
+                  <img 
+                    src={preset.thumbnail} 
+                    alt={preset.name}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
+                </div>
+                <div className="bg-black/80 p-3">
+                  <p className="text-white text-sm font-medium">{preset.name}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+      
+      {/* Decorative elements */}
+      <div className="hidden md:block absolute -bottom-16 -left-16 w-64 h-64 bg-purple-500 rounded-full filter blur-3xl opacity-20"></div>
+      <div className="hidden md:block absolute -top-16 -right-16 w-64 h-64 bg-yellow-300 rounded-full filter blur-3xl opacity-10"></div>
     </div>
   );
 };
