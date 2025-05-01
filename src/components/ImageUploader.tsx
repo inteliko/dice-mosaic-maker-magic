@@ -1,5 +1,5 @@
 
-import { useState, useRef, ChangeEvent, DragEvent } from "react";
+import { useState, useRef, ChangeEvent } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,6 @@ interface ImageUploaderProps {
 
 const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -43,7 +42,6 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
       return;
     }
 
-    setPreviewUrl(URL.createObjectURL(file));
     onImageUpload(file);
   };
 
@@ -53,14 +51,46 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
     }
   };
 
+  const sampleImages = [
+    "/placeholder.svg",
+    "/placeholder.svg",
+    "/placeholder.svg",
+  ];
+
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-3">
       <Button 
         onClick={handleButtonClick}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
       >
+        <Upload size={18} />
         Upload Image
       </Button>
+      
+      <div className="text-center text-xs text-gray-500 my-2">or select a sample</div>
+      
+      <div className="flex justify-center gap-2">
+        {sampleImages.map((image, index) => (
+          <button 
+            key={index}
+            className="rounded-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors w-14 h-14"
+            onClick={() => {
+              // This would need to be implemented to load sample images
+              toast({
+                title: "Sample selected",
+                description: `Sample image ${index + 1} selected.`
+              });
+            }}
+          >
+            <img 
+              src={image} 
+              alt={`Sample ${index + 1}`} 
+              className="w-full h-full object-cover"
+            />
+          </button>
+        ))}
+      </div>
+
       <input
         type="file"
         ref={fileInputRef}

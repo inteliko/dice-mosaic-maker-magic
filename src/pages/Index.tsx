@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ImageUploader from "@/components/ImageUploader";
-import MosaicControls, { MosaicSettings } from "@/components/MosaicControls";
+import ControlSidebar from "@/components/ControlSidebar";
 import DicePreview from "@/components/DicePreview";
 import HeroSection from "@/components/HeroSection";
+import { MosaicSettings } from "@/components/MosaicControls";
 import { processImage, generateSampleGrid } from "@/utils/imageProcessor";
 import { Helmet } from "react-helmet";
 import MosaicGallery from "@/components/MosaicGallery";
@@ -20,6 +20,7 @@ const Index = () => {
   const [blackDiceCount, setBlackDiceCount] = useState(0);
   const [whiteDiceCount, setWhiteDiceCount] = useState(0);
   const [diceColorCounts, setDiceColorCounts] = useState<Record<number, number>>({});
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -79,6 +80,13 @@ const Index = () => {
   };
 
   const handleImageUpload = (file: File) => {
+    // If an empty file was passed, clear the current image
+    if (file.size === 0) {
+      setImageFile(null);
+      setImageUrl(null);
+      return;
+    }
+    
     setImageFile(file);
     setImageUrl(null);
     setDiceGrid([]);
@@ -151,19 +159,23 @@ const Index = () => {
       <Helmet>
         <title>Dice Mosaic Generator | Transform Images into Dice Art</title>
         <meta name="description" content="Create beautiful dice mosaics from your images. Transform photos into unique artwork made entirely of dice." />
-        <meta name="keywords" content="dice mosaic, dice art, image to dice, mosaic generator, dice artwork" />
-        <meta property="og:title" content="Dice Mosaic Generator | Transform Images into Dice Art" />
-        <meta property="og:description" content="Create beautiful dice mosaics from your images. Transform photos into unique artwork made entirely of dice." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://dicemosaicgenerator.com" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Dice Mosaic Generator | Transform Images into Dice Art" />
-        <meta name="twitter:description" content="Create beautiful dice mosaics from your images. Transform photos into unique artwork made entirely of dice." />
       </Helmet>
       
       <Header />
       
-      <main className="flex-grow">
+      {/* Control Sidebar */}
+      <ControlSidebar
+        onGenerate={generateMosaic}
+        imageFile={imageFile}
+        onImageUpload={handleImageUpload}
+        blackDiceCount={blackDiceCount}
+        whiteDiceCount={whiteDiceCount}
+        diceColorCounts={diceColorCounts}
+        isOpen={isSidebarOpen}
+        onOpenChange={setSidebarOpen}
+      />
+      
+      <main className="flex-grow ml-0 md:ml-0 transition-all duration-300">
         <HeroSection />
         
         <div className="container mx-auto py-16 px-4">
@@ -177,36 +189,9 @@ const Index = () => {
             </p>
           </section>
           
-          <div className="max-w-5xl mx-auto space-y-8">
+          <div className="max-w-5xl mx-auto">
             <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
-              <h2 className="text-xl font-semibold mb-4 text-purple-800">1. Upload Your Image</h2>
-              <ImageUploader onImageUpload={handleImageUpload} />
-              {imageUrl && (
-                <div className="mt-4">
-                  <p className="text-sm text-gray-500 mb-2">Using preset image:</p>
-                  <div className="w-full max-w-xs mx-auto">
-                    <img 
-                      src={imageUrl} 
-                      alt="Selected preset" 
-                      className="w-full h-auto rounded-lg border border-gray-200"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
-              <h2 className="text-xl font-semibold mb-4 text-purple-800">2. Configure Your Mosaic</h2>
-              <MosaicControls 
-                onGenerate={generateMosaic}
-                blackDiceCount={blackDiceCount}
-                whiteDiceCount={whiteDiceCount}
-                diceColorCounts={diceColorCounts}
-              />
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
-              <h2 className="text-xl font-semibold mb-4 text-purple-800">3. Preview Your Mosaic</h2>
+              <h2 className="text-xl font-semibold mb-4 text-purple-800">Preview Your Mosaic</h2>
               {isProcessing ? (
                 <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-white h-96">
                   <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>

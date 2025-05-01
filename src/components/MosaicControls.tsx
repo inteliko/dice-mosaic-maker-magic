@@ -76,94 +76,67 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
   };
 
   return (
-    <div className="p-4 border rounded-lg bg-white shadow-sm space-y-6">
+    <div className="space-y-5">
       <div className="space-y-3">
-        <div className="flex justify-between">
-          <Label htmlFor="grid-size">Grid Size: {gridSize}×{gridSize}</Label>
-          <span className="text-sm text-gray-500">{totalDice} dice</span>
-        </div>
-        <Slider 
-          id="grid-size"
-          min={10} 
-          max={100} 
-          step={1} 
-          value={[gridSize]} 
-          onValueChange={(values) => setGridSize(values[0])} 
-        />
+        <h3 className="font-medium text-purple-800">Grid Settings</h3>
         
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2 text-sm text-gray-600">
-          <div className="flex items-center gap-2">
-            <Move className="w-4 h-4" />
-            <span>Width: {widthCm.toFixed(1)} cm</span>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label htmlFor="grid-size" className="text-sm">Grid Size: {gridSize}×{gridSize}</Label>
+            <span className="text-xs text-gray-500">{totalDice} dice</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Weight className="w-4 h-4" />
-            <span>Height: {heightCm.toFixed(1)} cm</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Ruler className="w-4 h-4" />
-            <span>Dice Size: {DICE_SIZE_CM} cm</span>
-          </div>
-        </div>
-
-        <div className="mt-4 p-4 border rounded-lg bg-gray-50">
-          <h3 className="font-semibold mb-3">Dice Count by Face</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {[1, 2, 3, 4, 5, 6].map(face => {
-              const DiceIcon = DiceIcons[face as keyof typeof DiceIcons];
-              return (
-                <div 
-                  key={face} 
-                  className="flex items-center gap-2 p-2 rounded-lg border" 
-                  style={{backgroundColor: faceColors[face], color: face > 3 ? "#fff" : "#000"}}
-                >
-                  <DiceIcon className="w-5 h-5" />
-                  <div className="flex flex-col">
-                    <span className="text-xs">Face {face}</span>
-                    <span className="font-bold">{diceColorCounts[face] || 0}</span>
-                  </div>
-                </div>
-              );
-            })}
+          <Slider 
+            id="grid-size"
+            min={10} 
+            max={100} 
+            step={1} 
+            value={[gridSize]} 
+            onValueChange={(values) => setGridSize(values[0])} 
+            className="py-2"
+          />
+          
+          <div className="grid grid-cols-1 gap-3 mt-2 text-xs text-gray-600">
+            <div className="flex items-center gap-2">
+              <Move className="w-4 h-4" />
+              <span>Width: {widthCm.toFixed(1)} cm</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Weight className="w-4 h-4" />
+              <span>Height: {heightCm.toFixed(1)} cm</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Ruler className="w-4 h-4" />
+              <span>Dice Size: {DICE_SIZE_CM} cm</span>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-4 text-sm text-gray-600 border-t pt-2">
-          <div className="flex items-center gap-2">
-            <Square className="w-4 h-4" />
-            <span>Black Dice (6): {blackDiceCount}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Circle className="w-4 h-4" />
-            <span>White Dice (1): {whiteDiceCount}</span>
-          </div>
+        <div className="space-y-2 mt-4">
+          <Label htmlFor="contrast" className="text-sm">Contrast: {contrast}%</Label>
+          <Slider 
+            id="contrast"
+            min={0} 
+            max={100} 
+            step={1} 
+            value={[contrast]} 
+            onValueChange={(values) => setContrast(values[0])} 
+            className="py-2"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2 mt-4">
+          <Switch 
+            id="use-shading" 
+            checked={useShading} 
+            onCheckedChange={setUseShading} 
+          />
+          <Label htmlFor="use-shading" className="text-sm">Use shading styles</Label>
         </div>
       </div>
 
       <div className="space-y-3">
-        <Label htmlFor="contrast">Contrast: {contrast}%</Label>
-        <Slider 
-          id="contrast"
-          min={0} 
-          max={100} 
-          step={1} 
-          value={[contrast]} 
-          onValueChange={(values) => setContrast(values[0])} 
-        />
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Switch 
-          id="use-shading" 
-          checked={useShading} 
-          onCheckedChange={setUseShading} 
-        />
-        <Label htmlFor="use-shading">Use shading styles</Label>
-      </div>
-
-      <div className="space-y-3">
-        <Label>Dice Face Colors</Label>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <h3 className="font-medium text-purple-800">Dice Face Colors</h3>
+        <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: 6 }, (_, i) => i + 1).map((faceNumber) => (
             <ColorPicker
               key={faceNumber}
@@ -175,11 +148,43 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
         </div>
       </div>
 
-      <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mt-6">
-        <Button className="bg-dice-primary hover:bg-dice-secondary" onClick={handleGenerate}>
+      <div className="mt-4 p-3 border rounded-lg bg-gray-50">
+        <h3 className="text-sm font-medium mb-2">Dice Count</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {[1, 2, 3, 4, 5, 6].map(face => {
+            const DiceIcon = DiceIcons[face as keyof typeof DiceIcons];
+            return (
+              <div 
+                key={face} 
+                className="flex items-center gap-1 p-2 rounded-lg border" 
+                style={{backgroundColor: faceColors[face], color: face > 3 ? "#fff" : "#000"}}
+              >
+                <DiceIcon className="w-4 h-4" />
+                <div className="flex flex-col">
+                  <span className="text-xs">{diceColorCounts[face] || 0}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-gray-600">
+          <div className="flex items-center gap-1">
+            <Square className="w-3 h-3" />
+            <span>Black: {blackDiceCount}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Circle className="w-3 h-3" />
+            <span>White: {whiteDiceCount}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col space-y-2 mt-6">
+        <Button className="w-full bg-purple-600 hover:bg-purple-700" onClick={handleGenerate}>
           Generate Mosaic
         </Button>
-        <Button variant="outline" onClick={resetToDefaults}>
+        <Button variant="outline" onClick={resetToDefaults} className="w-full">
           Reset Settings
         </Button>
       </div>
