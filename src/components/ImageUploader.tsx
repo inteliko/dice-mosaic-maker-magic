@@ -61,9 +61,9 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
     <div className="flex flex-col items-center gap-3">
       <Button 
         onClick={handleButtonClick}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-sm font-medium"
       >
-        <Upload size={18} />
+        <Upload size={18} className="mr-1" />
         Upload Image
       </Button>
       

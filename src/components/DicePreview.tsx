@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MosaicSettings } from "./MosaicControls";
 import DiceCanvas from "./DiceCanvas";
@@ -11,11 +11,16 @@ interface DicePreviewProps {
   settings: MosaicSettings;
   blackDiceCount: number;
   whiteDiceCount: number;
+  isVisible: boolean;
 }
 
-const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: DicePreviewProps) => {
+const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVisible }: DicePreviewProps) => {
   const [currentCanvas, setCurrentCanvas] = useState<HTMLCanvasElement | null>(null);
   const { toast } = useToast();
+
+  if (!isVisible) {
+    return null;
+  }
 
   const downloadImage = () => {
     if (!currentCanvas) return;
@@ -77,8 +82,8 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount }: Dic
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center p-4 border rounded-lg bg-white shadow-sm">
-        <div className="overflow-auto max-h-[600px] w-full flex items-center justify-center p-4">
+      <div className="flex flex-col items-center border rounded-lg bg-white shadow-sm">
+        <div className="max-h-[80vh] w-full flex items-center justify-center p-4 overflow-hidden">
           <DiceCanvas
             diceGrid={diceGrid}
             settings={settings}

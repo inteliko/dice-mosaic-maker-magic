@@ -21,6 +21,7 @@ const Index = () => {
   const [whiteDiceCount, setWhiteDiceCount] = useState(0);
   const [diceColorCounts, setDiceColorCounts] = useState<Record<number, number>>({});
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -65,6 +66,7 @@ const Index = () => {
       
       setDiceGrid(grid);
       setSettings(defaultSettings);
+      setShowPreview(true);
       
       const counts = countDiceColors(grid, defaultSettings.faceColors);
       setBlackDiceCount(counts.black);
@@ -84,6 +86,8 @@ const Index = () => {
     if (file.size === 0) {
       setImageFile(null);
       setImageUrl(null);
+      setDiceGrid([]);
+      setShowPreview(false);
       return;
     }
     
@@ -93,6 +97,7 @@ const Index = () => {
     setBlackDiceCount(0);
     setWhiteDiceCount(0);
     setDiceColorCounts({});
+    setSidebarOpen(true);
   };
 
   const generateMosaic = async (newSettings: MosaicSettings) => {
@@ -106,6 +111,7 @@ const Index = () => {
       setWhiteDiceCount(counts.white);
       setDiceColorCounts(counts.byFace);
       localStorage.setItem("diceMosaicGrid", JSON.stringify(sampleGrid));
+      setShowPreview(true);
       return;
     }
     
@@ -122,6 +128,7 @@ const Index = () => {
       setWhiteDiceCount(counts.white);
       setDiceColorCounts(counts.byFace);
       localStorage.setItem("diceMosaicGrid", JSON.stringify(grid));
+      setShowPreview(true);
     } catch (error) {
       console.error("Error processing image:", error);
     } finally {
@@ -175,7 +182,7 @@ const Index = () => {
         onOpenChange={setSidebarOpen}
       />
       
-      <main className="flex-grow ml-0 md:ml-0 transition-all duration-300">
+      <main className="flex-grow transition-all duration-300">
         <HeroSection />
         
         <div className="container mx-auto py-16 px-4">
@@ -190,34 +197,37 @@ const Index = () => {
           </section>
           
           <div className="max-w-5xl mx-auto">
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
-              <h2 className="text-xl font-semibold mb-4 text-purple-800">Preview Your Mosaic</h2>
-              {isProcessing ? (
-                <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-white h-96">
-                  <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="mt-4 text-gray-600">Processing your image...</p>
-                </div>
-              ) : (
-                <DicePreview 
-                  diceGrid={diceGrid} 
-                  settings={settings || {
-                    gridSize: 20,
-                    contrast: 50,
-                    useShading: true,
-                    faceColors: {
-                      1: "#FFFFFF",
-                      2: "#DDDDDD",
-                      3: "#BBBBBB",
-                      4: "#888888",
-                      5: "#555555",
-                      6: "#222222",
-                    },
-                  }}
-                  blackDiceCount={blackDiceCount}
-                  whiteDiceCount={whiteDiceCount}
-                />
-              )}
-            </div>
+            {(isProcessing || showPreview) && (
+              <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
+                <h2 className="text-xl font-semibold mb-4 text-purple-800">Preview Your Mosaic</h2>
+                {isProcessing ? (
+                  <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-white h-96">
+                    <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="mt-4 text-gray-600">Processing your image...</p>
+                  </div>
+                ) : (
+                  <DicePreview 
+                    diceGrid={diceGrid} 
+                    settings={settings || {
+                      gridSize: 20,
+                      contrast: 50,
+                      useShading: true,
+                      faceColors: {
+                        1: "#FFFFFF",
+                        2: "#DDDDDD",
+                        3: "#BBBBBB",
+                        4: "#888888",
+                        5: "#555555",
+                        6: "#222222",
+                      },
+                    }}
+                    blackDiceCount={blackDiceCount}
+                    whiteDiceCount={whiteDiceCount}
+                    isVisible={showPreview}
+                  />
+                )}
+              </div>
+            )}
           </div>
 
           <MosaicGallery />

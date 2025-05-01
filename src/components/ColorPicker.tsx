@@ -23,13 +23,13 @@ const ColorPicker = ({ faceNumber, initialColor, onChange }: ColorPickerProps) =
   };
 
   return (
-    <div className="flex items-center gap-1">
-      <span className="text-xs font-medium">{faceNumber}</span>
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium w-8 text-center">{faceNumber}</span>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-full h-6 p-0 rounded-md border"
+            className="w-full h-8 p-0 rounded-md border shadow-sm"
             style={{ backgroundColor: color }}
           >
             <span className="sr-only">Pick a color for dice face {faceNumber}</span>
@@ -37,15 +37,15 @@ const ColorPicker = ({ faceNumber, initialColor, onChange }: ColorPickerProps) =
         </PopoverTrigger>
         <PopoverContent className="w-auto p-3">
           <div className="flex flex-col gap-2">
-            <label htmlFor={`face-${faceNumber}`} className="sr-only">
-              Pick a color
+            <label htmlFor={`face-${faceNumber}`} className="text-sm font-medium">
+              Face {faceNumber} Color
             </label>
             <input
               id={`face-${faceNumber}`}
               type="color"
               value={color}
               onChange={handleColorChange}
-              className="w-32 h-8 cursor-pointer"
+              className="w-40 h-10 cursor-pointer rounded"
             />
           </div>
         </PopoverContent>

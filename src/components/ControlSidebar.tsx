@@ -1,9 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { Settings, X } from "lucide-react";
+import { Settings, X, PanelLeft, PanelRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import ImageUploader from "./ImageUploader";
 import MosaicControls, { MosaicSettings } from "./MosaicControls";
 import { cn } from "@/lib/utils";
@@ -29,7 +28,7 @@ const ControlSidebar = ({
   isOpen: propIsOpen,
   onOpenChange
 }: ControlSidebarProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const { toast } = useToast();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -44,6 +43,8 @@ const ControlSidebar = ({
       const url = URL.createObjectURL(imageFile);
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
     }
   }, [imageFile]);
 
@@ -56,23 +57,32 @@ const ControlSidebar = ({
 
   return (
     <>
-      {/* Mobile trigger */}
-      <div className="fixed top-20 left-4 z-40 md:hidden">
+      {/* Toggle button for both mobile and desktop */}
+      <div className="fixed top-20 left-4 z-40">
         <Button 
           variant="outline" 
-          size="icon" 
-          className="rounded-full shadow-md bg-white hover:bg-purple-100"
-          onClick={() => handleOpenChange(true)}
+          size="sm" 
+          className="rounded-full shadow-md bg-white hover:bg-purple-100 flex items-center gap-1 px-3"
+          onClick={() => handleOpenChange(!isOpen)}
         >
-          <Settings className="h-6 w-6 text-purple-600" />
-          <span className="sr-only">Open controls</span>
+          {isOpen ? (
+            <>
+              <PanelLeft className="h-4 w-4 text-purple-600" />
+              <span className="text-xs font-medium">Close Controls</span>
+            </>
+          ) : (
+            <>
+              <PanelRight className="h-4 w-4 text-purple-600" />
+              <span className="text-xs font-medium">Open Controls</span>
+            </>
+          )}
         </Button>
       </div>
 
       {/* Desktop sidebar */}
       <div 
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -104,18 +114,16 @@ const ControlSidebar = ({
                         className="w-full h-auto object-cover"
                       />
                     </div>
-                    <div className="flex justify-center">
-                      <Button 
-                        variant="outline" 
-                        className="text-sm w-full"
-                        onClick={() => {
-                          onImageUpload(new File([], ""));
-                          setPreviewUrl(null);
-                        }}
-                      >
-                        Change Image
-                      </Button>
-                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="text-sm w-full"
+                      onClick={() => {
+                        onImageUpload(new File([], ""));
+                        setPreviewUrl(null);
+                      }}
+                    >
+                      Change Image
+                    </Button>
                   </div>
                 ) : (
                   <ImageUploader
@@ -143,25 +151,6 @@ const ControlSidebar = ({
           onClick={() => handleOpenChange(false)}
         ></div>
       )}
-
-      {/* Desktop trigger */}
-      <div className="fixed top-20 left-4 z-30 hidden md:block">
-        <Button 
-          variant={isOpen ? "ghost" : "outline"}
-          size="icon" 
-          className={cn(
-            "rounded-full shadow-md transition-all",
-            isOpen ? "bg-transparent hover:bg-transparent" : "bg-white hover:bg-purple-100"
-          )}
-          onClick={() => handleOpenChange(!isOpen)}
-        >
-          <Settings className={cn(
-            "h-6 w-6",
-            isOpen ? "text-white" : "text-purple-600"
-          )} />
-          <span className="sr-only">Toggle controls</span>
-        </Button>
-      </div>
     </>
   );
 };
