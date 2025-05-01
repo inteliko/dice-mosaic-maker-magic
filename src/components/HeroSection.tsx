@@ -365,7 +365,7 @@ const HeroSection = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 tracking-tight font-serif italic" style={{
           textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
         }}>
-            <span className="bg-gradient-to-r from-purple-800 via-purple-600 to-purple-900 bg-clip-text text-transparent drop-shadow-sm mx-0 font-light">Dice Mosaics</span>
+            <span className="bg-gradient-to-r from-purple-800 via-purple-600 to-purple-900 bg-clip-text drop-shadow-sm mx-0 font-light text-8xl text-gray-900">Dice Mosaics</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-800 max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed font-serif">
             Create stunning artwork using nothing but dice. 
