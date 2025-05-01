@@ -161,8 +161,13 @@ const Index = () => {
     return { black, white, byFace };
   };
 
+  // Toggle function for the control sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-50 to-white">
+    <div className="flex flex-col min-h-screen bg-white">
       <Helmet>
         <title>Dice Mosaic Generator | Transform Images into Dice Art</title>
         <meta name="description" content="Create beautiful dice mosaics from your images. Transform photos into unique artwork made entirely of dice." />
@@ -185,20 +190,35 @@ const Index = () => {
       <main className="flex-grow transition-all duration-300">
         <HeroSection />
         
-        <div className="container mx-auto py-16 px-4">
-          <section className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-dice-primary to-purple-600 bg-clip-text text-transparent">
-              Create Your Dice Mosaic
-            </h2>
-            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              Transform any image into a beautiful mosaic made of dice. Upload your photo, adjust the settings, 
-              and generate a unique piece of dice art that will impress everyone.
-            </p>
-          </section>
+        <div className="container mx-auto px-4">
+          {/* Toggle Controls Button - centered at the top where the section header used to be */}
+          <div className="flex justify-center my-6">
+            <button
+              onClick={toggleSidebar}
+              className="bg-purple-700 hover:bg-purple-800 text-white rounded-full px-6 py-3 flex items-center gap-2 shadow-md transition-colors duration-300"
+            >
+              {isSidebarOpen ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-panel-left">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="9" y1="3" y2="21"/>
+                  </svg>
+                  Close Controls
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-panel-right">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="15" x2="15" y1="3" y2="21"/>
+                  </svg>
+                  Open Controls
+                </>
+              )}
+            </button>
+          </div>
           
+          {/* Preview section - only shown when there's something to preview */}
           <div className="max-w-5xl mx-auto">
             {(isProcessing || showPreview) && (
-              <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
+              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 mb-16">
                 <h2 className="text-xl font-semibold mb-4 text-purple-800">Preview Your Mosaic</h2>
                 {isProcessing ? (
                   <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-white h-96">
@@ -206,25 +226,27 @@ const Index = () => {
                     <p className="mt-4 text-gray-600">Processing your image...</p>
                   </div>
                 ) : (
-                  <DicePreview 
-                    diceGrid={diceGrid} 
-                    settings={settings || {
-                      gridSize: 20,
-                      contrast: 50,
-                      useShading: true,
-                      faceColors: {
-                        1: "#FFFFFF",
-                        2: "#DDDDDD",
-                        3: "#BBBBBB",
-                        4: "#888888",
-                        5: "#555555",
-                        6: "#222222",
-                      },
-                    }}
-                    blackDiceCount={blackDiceCount}
-                    whiteDiceCount={whiteDiceCount}
-                    isVisible={showPreview}
-                  />
+                  <div className="fixed-preview overflow-hidden">
+                    <DicePreview 
+                      diceGrid={diceGrid} 
+                      settings={settings || {
+                        gridSize: 20,
+                        contrast: 50,
+                        useShading: true,
+                        faceColors: {
+                          1: "#FFFFFF",
+                          2: "#DDDDDD",
+                          3: "#BBBBBB",
+                          4: "#888888",
+                          5: "#555555",
+                          6: "#222222",
+                        },
+                      }}
+                      blackDiceCount={blackDiceCount}
+                      whiteDiceCount={whiteDiceCount}
+                      isVisible={showPreview}
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -235,6 +257,29 @@ const Index = () => {
       </main>
       
       <Footer />
+      
+      {/* Add custom styles for the fixed preview */}
+      <style jsx="true">{`
+        .fixed-preview {
+          max-height: 70vh;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+          border-radius: 0.5rem;
+        }
+        
+        /* Hide the unclear parts by showing only the center of the preview */
+        .fixed-preview > div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+          .fixed-preview {
+            max-height: 50vh;
+          }
+        }
+      `}</style>
     </div>
   );
 };

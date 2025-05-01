@@ -51,44 +51,41 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
     }
   };
 
-  const sampleImages = [
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-  ];
-
   return (
     <div className="flex flex-col items-center gap-3">
       <Button 
         onClick={handleButtonClick}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-sm font-medium"
+        className="w-full bg-purple-700 hover:bg-purple-800 text-white shadow-md font-medium rounded-md"
       >
-        <Upload size={18} className="mr-1" />
-        Upload Image
+        <Upload size={18} className="mr-2" />
+        Select Image
       </Button>
       
-      <div className="text-center text-xs text-gray-500 my-2">or select a sample</div>
+      <div className="text-center text-xs text-gray-500 my-1">or drag & drop image here</div>
       
-      <div className="flex justify-center gap-2">
-        {sampleImages.map((image, index) => (
-          <button 
-            key={index}
-            className="rounded-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors w-14 h-14"
-            onClick={() => {
-              // This would need to be implemented to load sample images
-              toast({
-                title: "Sample selected",
-                description: `Sample image ${index + 1} selected.`
-              });
-            }}
-          >
-            <img 
-              src={image} 
-              alt={`Sample ${index + 1}`} 
-              className="w-full h-full object-cover"
-            />
-          </button>
-        ))}
+      <div 
+        className={`w-full border-2 border-dashed rounded-lg p-4 transition-colors ${
+          isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 bg-gray-50'
+        }`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          
+          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            validateAndProcessFile(e.dataTransfer.files[0]);
+          }
+        }}
+      >
+        <div className="flex flex-col items-center justify-center py-4">
+          <Upload className="h-10 w-10 text-gray-400 mb-2" />
+          <p className="text-sm text-gray-500">Drop your image here</p>
+          <p className="text-xs text-gray-400 mt-1">JPG or PNG, max 5MB</p>
+        </div>
       </div>
 
       <input
