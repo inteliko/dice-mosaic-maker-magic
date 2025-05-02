@@ -9,7 +9,7 @@ interface DiceDownloadButtonsProps {
 
 const DiceDownloadButtons = ({ onDownloadImage, onDownloadCSV }: DiceDownloadButtonsProps) => {
   return (
-    <div className="flex flex-wrap gap-4 justify-center">
+    <div className="flex flex-wrap gap-4 justify-center my-4">
       <Button 
         className="bg-black text-white hover:bg-gray-800 flex items-center gap-2"
         onClick={onDownloadImage}

@@ -18,39 +18,48 @@ const HeroSection = () => {
   const [showImageUpload, setShowImageUpload] = useState(false);
 
   // Sample images for quick selection - updated with a 4x4 grid of object images
-  const presetImages = [{
-    name: "Rubik's Cube",
-    thumbnail: "https://images.unsplash.com/photo-1496354265829-17b1c7b7c363?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1496354265829-17b1c7b7c363?w=800&auto=format&fit=crop"
-  }, {
-    name: "Panda",
-    thumbnail: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef3?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef3?w=800&auto=format&fit=crop"
-  }, {
-    name: "Guitar",
-    thumbnail: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=800&auto=format&fit=crop"
-  }, {
-    name: "Capybara",
-    thumbnail: "https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?w=800&auto=format&fit=crop"
-  }, {
-    name: "White Tiger",
-    thumbnail: "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?w=800&auto=format&fit=crop"
-  }, {
-    name: "Toucan",
-    thumbnail: "https://images.unsplash.com/photo-1550853024-fae8cd4be47f?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1550853024-fae8cd4be47f?w=800&auto=format&fit=crop"
-  }, {
-    name: "Frog",
-    thumbnail: "https://images.unsplash.com/photo-1551189014-fe59d5efc731?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1551189014-fe59d5efc731?w=800&auto=format&fit=crop"
-  }, {
-    name: "Tabby Cat",
-    thumbnail: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop",
-    url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop"
-  }];
+  const presetImages = [
+    {
+      name: "Rubik's Cube",
+      thumbnail: "https://images.unsplash.com/photo-1496354265829-17b1c7b7c363?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1496354265829-17b1c7b7c363?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "Panda",
+      thumbnail: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef3?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef3?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "Guitar",
+      thumbnail: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "Capybara",
+      thumbnail: "https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "White Tiger",
+      thumbnail: "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "Toucan",
+      thumbnail: "https://images.unsplash.com/photo-1550853024-fae8cd4be47f?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1550853024-fae8cd4be47f?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "Frog",
+      thumbnail: "https://images.unsplash.com/photo-1551189014-fe59d5efc731?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1551189014-fe59d5efc731?w=800&auto=format&fit=crop"
+    },
+    {
+      name: "Tabby Cat",
+      thumbnail: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop",
+      url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop"
+    }
+  ];
   const handlePresetSelect = (imageUrl: string) => {
     setSelectedPreset(imageUrl);
     // Create a data transfer object to pass to generate mosaic
@@ -67,8 +76,18 @@ const HeroSection = () => {
       description: "Your image has been selected for processing."
     });
     setShowImageUpload(false);
-    // Pass the file to the main component for processing
-    // This would need to be implemented by passing a callback from the parent
+    
+    // Navigate to home with the file data
+    // Since we can't pass File objects directly in state, we'll use URL.createObjectURL
+    const fileUrl = URL.createObjectURL(file);
+    const dataToPass = {
+      presetImageUrl: fileUrl,
+      fileName: file.name
+    };
+    
+    navigate('/', {
+      state: dataToPass
+    });
   };
   useEffect(() => {
     if (!containerRef.current) return;

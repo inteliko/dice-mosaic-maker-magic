@@ -69,6 +69,15 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     });
   };
 
+  // Calculate dice counts by face value
+  const diceColorCounts: Record<string, number> = {};
+  diceGrid.forEach(row => {
+    row.forEach(value => {
+      const color = settings.faceColors[value] || "#000000";
+      diceColorCounts[color] = (diceColorCounts[color] || 0) + 1;
+    });
+  });
+
   if (!diceGrid.length) {
     return (
       <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-gray-50 h-96">
@@ -77,8 +86,8 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     );
   }
 
-  const width = settings.gridSize * 1.6;
-  const height = settings.gridSize * 1.6;
+  const width = settings.gridSize * diceGrid[0].length / 10;
+  const height = settings.gridSize * diceGrid.length / 10;
 
   return (
     <div className="mosaic-preview-container">
@@ -127,53 +136,22 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
             </div>
           </div>
           
-          <div className="text-center mt-8 mb-6">
-            <button 
-              className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
-              onClick={downloadImage}
-            >
-              Generate PNG
-            </button>
-          </div>
-          
-          <div className="dice-mosaic-message mt-8 border-t pt-6">
-            <h2 className="text-2xl font-bold text-center text-amber-500 mb-4">Your Mosaic is looking Great!</h2>
-            <p className="text-center text-gray-600 max-w-2xl mx-auto">
-              Dice mosaics are an awesome project to keep you entertained and harness your inner
-              creativity! Impress your friends, make a personable gift, or spend some valuable time
-              putting one together with the family. When you are finished, hang it on your wall to show
-              off your amazing skills!
-            </p>
-          </div>
-          
-          <div className="mt-8 mb-4">
-            <h3 className="font-bold text-lg mb-2">Now what?</h3>
-            <ul className="space-y-2 text-left text-sm">
-              <li className="flex items-start">
-                <span className="text-amber-500 mr-2">•</span>
-                <span>Save your customized dice art as a png for <span className="font-bold">free!</span></span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-amber-500 mr-2">•</span>
-                <span>Use our <span className="font-bold">dice counter</span> to check how many dice you will need for the project</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-amber-500 mr-2">•</span>
-                <span>Head over to our <span className="font-bold">shop</span> where you can purchase the dice in bulk</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-amber-500 mr-2">•</span>
-                <span>Read our <span className="font-bold">blog</span> for tips and tricks about how to create dice mosaics</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div className="flex justify-center gap-4 mt-6">
-            <DiceDownloadButtons 
+          <div className="text-center mt-6">
+            <DiceDownloadButtons
               onDownloadImage={downloadImage}
               onDownloadCSV={downloadCSV}
             />
           </div>
+          
+          <MosaicSummary
+            width={(width * 6)}
+            height={(height * 6)}
+            blackDiceCount={blackDiceCount}
+            whiteDiceCount={whiteDiceCount}
+            isVisible={true}
+            onDownloadImage={downloadImage}
+            diceColors={diceColorCounts}
+          />
         </div>
       </div>
     </div>
