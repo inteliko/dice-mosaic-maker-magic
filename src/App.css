@@ -63,3 +63,37 @@
 .button-white:hover {
   background-color: #f5f5f5;
 }
+
+/* Responsive mosaic preview styles */
+.mosaic-preview-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .mosaic-preview-container {
+    padding: 10px;
+  }
+}
+
+/* Style for the preview section */
+.preview-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-top: 40px;
+  overflow: hidden;
+}
+
+.preview-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Ash color for gallery background */
+.gallery-section {
+  background-color: #F1F0FB;
+  padding: 3rem 1rem;
+}

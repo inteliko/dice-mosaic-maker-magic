@@ -33,7 +33,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     canvas.width = cols * cellSize;
     canvas.height = rows * cellSize;
     
-    // Changed to black background
+    // Changed to black background for consistent look
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MosaicSettings } from "./MosaicControls";
 import DiceCanvas from "./DiceCanvas";
@@ -82,8 +82,12 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center border border-gray-300 rounded-lg bg-black shadow-lg">
-        <div className="max-h-[80vh] w-full flex items-center justify-center p-4 overflow-auto">
+      <div className="preview-header">
+        <h3 className="text-xl font-semibold mb-4">Preview Your Mosaic</h3>
+      </div>
+      
+      <div className="preview-canvas-container bg-white p-6 rounded-lg shadow-md">
+        <div className="max-h-[80vh] w-full flex items-center justify-center overflow-auto">
           <DiceCanvas
             diceGrid={diceGrid}
             settings={settings}
@@ -105,6 +109,29 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
         onDownloadImage={downloadImage}
         onDownloadCSV={downloadCSV}
       />
+
+      <style jsx>{`
+        .preview-header {
+          text-align: left;
+          margin-bottom: 1rem;
+        }
+        
+        .preview-canvas-container {
+          background-color: white;
+          border: 1px solid #e5e5e5;
+          border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+          .preview-header {
+            text-align: center;
+          }
+          
+          .preview-canvas-container {
+            padding: 0.75rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };
