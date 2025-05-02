@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,12 +25,12 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				dice: {
-					primary: '#9b87f5',
-					secondary: '#7E69AB',
-					dark: '#1A1F2C',
-					light: '#E5DEFF',
-					accent1: '#FDE1D3', // soft peach
-					accent2: '#D3E4FD', // soft blue
+					primary: '#000000',
+					secondary: '#333333',
+					dark: '#000000',
+					light: '#FFFFFF',
+					accent1: '#F1F1F1', // light gray
+					accent2: '#DDDDDD', // mid gray
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',

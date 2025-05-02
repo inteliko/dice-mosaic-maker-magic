@@ -6,6 +6,7 @@ import { Upload } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ImageUploader from './ImageUploader';
 import { useToast } from '@/hooks/use-toast';
+
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -137,7 +138,7 @@ const HeroSection = () => {
 
       // Material based on dice color
       const material = new THREE.MeshStandardMaterial({
-        color: isWhite ? 0xffffff : 0x222222,
+        color: isWhite ? 0xffffff : 0x000000,  // Changed to pure black (#000000)
         roughness: 0.1,
         metalness: 0.2
       });
@@ -148,8 +149,7 @@ const HeroSection = () => {
         const dotSize = isMobileView ? 0.15 : 0.18;
         const dotGeo = new THREE.SphereGeometry(dotSize, 16, 16);
         const dotMat = new THREE.MeshStandardMaterial({
-          color: isWhite ? 0x222222 : 0xffffff,
-          // Black dots on white dice, white dots on black dice
+          color: isWhite ? 0x000000 : 0xffffff,  // Black dots on white dice, white dots on black dice
           roughness: 0.3,
           metalness: 0.1
         });
@@ -206,8 +206,8 @@ const HeroSection = () => {
       dice.position.set((Math.random() * visibleWidth - visibleWidth / 2) * 0.9, 15 + Math.random() * 10, Math.random() * 10 - 15);
       dice.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
 
-      // Slower, gentler animation on mobile
-      const speedFactor = isMobileView ? 0.5 : 1;
+      // Slower animation for all devices
+      const speedFactor = isMobileView ? 0.3 : 0.4;  // Reduced speed factor to make animation slower
 
       // Randomized rotation velocity
       const rotVel = {
@@ -244,7 +244,7 @@ const HeroSection = () => {
     }
 
     // Create a spawn interval
-    const spawnDelay = isMobileView ? 500 : 300;
+    const spawnDelay = isMobileView ? 700 : 500;  // Increased delay for slower spawning
     const spawnInterval = setInterval(() => {
       if (diceCount < maxDice) {
         const dice = createDice();
@@ -361,11 +361,11 @@ const HeroSection = () => {
       <div ref={containerRef} className="absolute inset-0" />
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 z-10">
-        <div className="animate-fade-in mx-0 px-0">
+        <div className="animate-fade-in mx-0 px-0 pt-12"> {/* Added top padding (pt-12) to the hero title */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 tracking-tight font-serif italic" style={{
           textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
         }}>
-            <span className="bg-gradient-to-r from-purple-800 via-purple-600 to-purple-900 bg-clip-text drop-shadow-sm mx-0 font-light text-8xl text-gray-900">Dice Mosaics</span>
+            <span className="bg-gradient-to-r from-black via-gray-800 to-black bg-clip-text drop-shadow-sm mx-0 font-light text-8xl text-gray-900">Dice Mosaics</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-800 max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed font-serif">
             Create stunning artwork using nothing but dice. 
@@ -377,7 +377,7 @@ const HeroSection = () => {
                 <Button variant="outline" className="mt-2 w-full" onClick={() => setShowImageUpload(false)}>
                   Cancel
                 </Button>
-              </div> : <Button size={isMobile ? "default" : "lg"} onClick={() => setShowImageUpload(true)} className="bg-purple-700 hover:bg-purple-800 text-white rounded-full px-6 md:px-8 py-2 md:py-6 font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              </div> : <Button size={isMobile ? "default" : "lg"} onClick={() => setShowImageUpload(true)} className="bg-black hover:bg-gray-800 text-white rounded-full px-6 md:px-8 py-2 md:py-6 font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <Upload className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                 Choose Image
               </Button>}
@@ -388,9 +388,9 @@ const HeroSection = () => {
         <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl animate-fade-in px-2 sm:px-4" style={{
         animationDelay: '0.3s'
       }}>
-          <h3 className="text-gray-800 text-base md:text-lg mb-3 md:mb-4 font-medium">Or select one of our preset images</h3>
+          <h3 className="text-black text-base md:text-lg mb-3 md:mb-4 font-medium">Or select one of our preset images</h3>
           <div className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-4'} gap-2 sm:gap-3`}>
-            {presetImages.map((preset, index) => <div key={index} className={`rounded-xl overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${selectedPreset === preset.url ? 'ring-2 ring-purple-500' : ''}`} onClick={() => handlePresetSelect(preset.url)}>
+            {presetImages.map((preset, index) => <div key={index} className={`rounded-xl overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${selectedPreset === preset.url ? 'ring-2 ring-black' : ''}`} onClick={() => handlePresetSelect(preset.url)}>
                 <div className="relative aspect-square">
                   <img src={preset.thumbnail} alt={preset.name} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>

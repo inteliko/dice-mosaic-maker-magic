@@ -33,7 +33,8 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     canvas.width = cols * cellSize;
     canvas.height = rows * cellSize;
     
-    ctx.fillStyle = "#ffffff";
+    // Changed to black background
+    ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     for (let row = 0; row < rows; row++) {
@@ -42,19 +43,22 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
         const x = col * cellSize;
         const y = row * cellSize;
         
+        // Use monochrome color scheme
         ctx.fillStyle = settings.faceColors[diceValue] || "#ffffff";
         ctx.fillRect(x, y, cellSize, cellSize);
         
-        // Thinner grid lines for better visibility
-        ctx.strokeStyle = "#dddddd";
+        // Darker grid lines for better contrast against black/white
+        ctx.strokeStyle = "#555555";
         ctx.lineWidth = 0.2;
         ctx.strokeRect(x, y, cellSize, cellSize);
         
         if (settings.useShading) {
           drawDiceFace(ctx, diceValue, x, y, cellSize, settings.faceColors[diceValue]);
         } else {
-          ctx.fillStyle = "#000000";
-          ctx.font = `${cellSize * 0.4}px Arial`; // Smaller font for better readability
+          // White text for contrast against dark backgrounds
+          const isDark = diceValue > 3;
+          ctx.fillStyle = isDark ? "#ffffff" : "#000000";
+          ctx.font = `${cellSize * 0.4}px Arial`; 
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(diceValue.toString(), x + cellSize / 2, y + cellSize / 2);
@@ -68,7 +72,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
   return (
     <canvas
       ref={canvasRef}
-      className="max-w-full h-auto border shadow-sm"
+      className="max-w-full h-auto border border-gray-800 shadow-md"
       style={{ imageRendering: "pixelated" }}
     />
   );

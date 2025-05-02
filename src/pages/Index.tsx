@@ -43,18 +43,18 @@ const Index = () => {
       
       setImageFile(file);
       
-      // Generate mosaic with default settings
+      // Generate mosaic with default settings using black and white color scheme
       const defaultSettings = {
         gridSize: 20,
         contrast: 50,
         useShading: true,
         faceColors: {
-          1: "#FFFFFF",
-          2: "#DDDDDD",
-          3: "#BBBBBB",
-          4: "#888888",
-          5: "#555555",
-          6: "#222222",
+          1: "#FFFFFF", // White
+          2: "#DDDDDD", // Light Gray
+          3: "#BBBBBB", // Medium Gray
+          4: "#888888", // Gray
+          5: "#555555", // Dark Gray
+          6: "#000000", // Black
         }
       };
       
@@ -195,7 +195,7 @@ const Index = () => {
           <div className="flex justify-center my-6">
             <button
               onClick={toggleSidebar}
-              className="bg-purple-700 hover:bg-purple-800 text-white rounded-full px-6 py-3 flex items-center gap-2 shadow-md transition-colors duration-300"
+              className="bg-black hover:bg-gray-800 text-white rounded-full px-6 py-3 flex items-center gap-2 shadow-md transition-colors duration-300"
             >
               {isSidebarOpen ? (
                 <>
@@ -219,10 +219,10 @@ const Index = () => {
           <div className="max-w-5xl mx-auto">
             {(isProcessing || showPreview) && (
               <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 mb-16">
-                <h2 className="text-xl font-semibold mb-4 text-purple-800">Preview Your Mosaic</h2>
+                <h2 className="text-xl font-semibold mb-4 text-black">Preview Your Mosaic</h2>
                 {isProcessing ? (
                   <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-white h-96">
-                    <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
                     <p className="mt-4 text-gray-600">Processing your image...</p>
                   </div>
                 ) : (
@@ -234,12 +234,12 @@ const Index = () => {
                         contrast: 50,
                         useShading: true,
                         faceColors: {
-                          1: "#FFFFFF",
-                          2: "#DDDDDD",
-                          3: "#BBBBBB",
-                          4: "#888888",
-                          5: "#555555",
-                          6: "#222222",
+                          1: "#FFFFFF", // White
+                          2: "#DDDDDD", // Light Gray
+                          3: "#BBBBBB", // Medium Gray
+                          4: "#888888", // Gray
+                          5: "#555555", // Dark Gray
+                          6: "#000000", // Black
                         },
                       }}
                       blackDiceCount={blackDiceCount}

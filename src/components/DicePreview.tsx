@@ -82,7 +82,7 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center border rounded-lg bg-white shadow-sm">
+      <div className="flex flex-col items-center border border-gray-300 rounded-lg bg-black shadow-lg">
         <div className="max-h-[80vh] w-full flex items-center justify-center p-4 overflow-auto">
           <DiceCanvas
             diceGrid={diceGrid}
