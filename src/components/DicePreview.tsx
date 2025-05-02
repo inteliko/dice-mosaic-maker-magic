@@ -81,57 +81,101 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
   const height = settings.gridSize * 1.6;
 
   return (
-    <div className="space-y-6">
-      <div className="preview-header">
-        <h3 className="text-xl font-semibold mb-4">Preview Your Mosaic</h3>
-      </div>
-      
-      <div className="preview-canvas-container bg-white p-6 rounded-lg shadow-md">
-        <div className="max-h-[80vh] w-full flex items-center justify-center overflow-auto">
-          <DiceCanvas
-            diceGrid={diceGrid}
-            settings={settings}
-            onCanvasReady={setCurrentCanvas}
-          />
+    <div className="mosaic-preview-container">
+      <div className="preview-section">
+        <div className="px-4 py-6">
+          <h3 className="text-center font-semibold">Mosaic Summary</h3>
+          
+          <div className="canvas-container flex justify-center my-4">
+            <DiceCanvas
+              diceGrid={diceGrid}
+              settings={settings}
+              onCanvasReady={setCurrentCanvas}
+            />
+          </div>
+          
+          <div className="mosaic-info-grid mt-6">
+            <div className="grid grid-cols-2 gap-2 text-sm max-w-md mx-auto">
+              <div className="text-left">Dice Size</div>
+              <div className="text-right font-medium">{settings.gridSize} mm</div>
+              
+              <div className="text-left">Width</div>
+              <div className="text-right font-medium">{(width * 6).toFixed(2)} cm</div>
+              
+              <div className="text-left">Height</div>
+              <div className="text-right font-medium">{(height * 6).toFixed(2)} cm</div>
+              
+              <div className="text-left">Estimated Time</div>
+              <div className="text-right font-medium">
+                {Math.floor((blackDiceCount + whiteDiceCount) / 10 / 60)} hours, {Math.floor((blackDiceCount + whiteDiceCount) / 10 % 60)} minutes
+              </div>
+              
+              <div className="text-left">Monetary value</div>
+              <div className="text-right font-medium">****** <a href="/blog" className="text-blue-600 underline">See Blog</a></div>
+              
+              <div className="text-left flex items-center">
+                <div className="w-3 h-3 bg-black rounded-sm mr-1"></div>
+                <span>Black Dice</span>
+              </div>
+              <div className="text-right font-medium">{blackDiceCount}</div>
+              
+              <div className="text-left flex items-center">
+                <div className="w-3 h-3 bg-white border border-gray-300 rounded-sm mr-1"></div>
+                <span>White Dice</span>
+              </div>
+              <div className="text-right font-medium">{whiteDiceCount}</div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8 mb-6">
+            <button 
+              className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              onClick={downloadImage}
+            >
+              Generate PNG
+            </button>
+          </div>
+          
+          <div className="dice-mosaic-message mt-8 border-t pt-6">
+            <h2 className="text-2xl font-bold text-center text-amber-500 mb-4">Your Mosaic is looking Great!</h2>
+            <p className="text-center text-gray-600 max-w-2xl mx-auto">
+              Dice mosaics are an awesome project to keep you entertained and harness your inner
+              creativity! Impress your friends, make a personable gift, or spend some valuable time
+              putting one together with the family. When you are finished, hang it on your wall to show
+              off your amazing skills!
+            </p>
+          </div>
+          
+          <div className="mt-8 mb-4">
+            <h3 className="font-bold text-lg mb-2">Now what?</h3>
+            <ul className="space-y-2 text-left text-sm">
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">•</span>
+                <span>Save your customized dice art as a png for <span className="font-bold">free!</span></span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">•</span>
+                <span>Use our <span className="font-bold">dice counter</span> to check how many dice you will need for the project</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">•</span>
+                <span>Head over to our <span className="font-bold">shop</span> where you can purchase the dice in bulk</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">•</span>
+                <span>Read our <span className="font-bold">blog</span> for tips and tricks about how to create dice mosaics</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div className="flex justify-center gap-4 mt-6">
+            <DiceDownloadButtons 
+              onDownloadImage={downloadImage}
+              onDownloadCSV={downloadCSV}
+            />
+          </div>
         </div>
       </div>
-
-      <MosaicSummary 
-        width={width}
-        height={height}
-        blackDiceCount={blackDiceCount}
-        whiteDiceCount={whiteDiceCount}
-        isVisible={diceGrid.length > 0}
-        onDownloadImage={downloadImage}
-      />
-
-      <DiceDownloadButtons
-        onDownloadImage={downloadImage}
-        onDownloadCSV={downloadCSV}
-      />
-
-      <style jsx>{`
-        .preview-header {
-          text-align: left;
-          margin-bottom: 1rem;
-        }
-        
-        .preview-canvas-container {
-          background-color: white;
-          border: 1px solid #e5e5e5;
-          border-radius: 8px;
-        }
-        
-        @media (max-width: 768px) {
-          .preview-header {
-            text-align: center;
-          }
-          
-          .preview-canvas-container {
-            padding: 0.75rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };

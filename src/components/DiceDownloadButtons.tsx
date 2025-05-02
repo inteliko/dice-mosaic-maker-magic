@@ -11,8 +11,7 @@ const DiceDownloadButtons = ({ onDownloadImage, onDownloadCSV }: DiceDownloadBut
   return (
     <div className="flex flex-wrap gap-4 justify-center">
       <Button 
-        variant="outline"
-        className="flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
+        className="bg-black text-white hover:bg-gray-800 flex items-center gap-2"
         onClick={onDownloadImage}
       >
         <FileImage className="w-4 h-4" />
@@ -20,7 +19,7 @@ const DiceDownloadButtons = ({ onDownloadImage, onDownloadCSV }: DiceDownloadBut
       </Button>
       <Button 
         variant="outline"
-        className="flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
+        className="border-black text-black hover:bg-gray-100 flex items-center gap-2"
         onClick={onDownloadCSV}
       >
         <FileText className="w-4 h-4" />

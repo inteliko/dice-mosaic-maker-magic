@@ -23,8 +23,8 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     const cols = diceGrid[0].length;
     
     // Adjust cell size based on grid dimensions for better visibility
-    const maxCanvasWidth = Math.min(window.innerWidth * 0.8, 800);
-    const maxCanvasHeight = Math.min(window.innerHeight * 0.6, 600);
+    const maxCanvasWidth = Math.min(window.innerWidth * 0.8, 600);
+    const maxCanvasHeight = Math.min(window.innerHeight * 0.5, 400);
     
     const cellSizeByWidth = maxCanvasWidth / cols;
     const cellSizeByHeight = maxCanvasHeight / rows;
@@ -72,7 +72,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
   return (
     <canvas
       ref={canvasRef}
-      className="max-w-full h-auto border border-gray-800 shadow-md"
+      className="max-w-full h-auto border border-gray-200 shadow-sm"
       style={{ imageRendering: "pixelated" }}
     />
   );

@@ -55,7 +55,7 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
     <div className="flex flex-col items-center gap-3">
       <Button 
         onClick={handleButtonClick}
-        className="w-full bg-purple-700 hover:bg-purple-800 text-white shadow-md font-medium rounded-md"
+        className="w-full bg-black hover:bg-gray-800 text-white shadow-md font-medium rounded-md"
       >
         <Upload size={18} className="mr-2" />
         Select Image
@@ -65,7 +65,7 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
       
       <div 
         className={`w-full border-2 border-dashed rounded-lg p-4 transition-colors ${
-          isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 bg-gray-50'
+          isDragging ? 'border-gray-500 bg-gray-50' : 'border-gray-300 bg-gray-50'
         }`}
         onDragOver={(e) => {
           e.preventDefault();

@@ -1,4 +1,3 @@
-
 import { FileImage, FileText, ShoppingCart, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
