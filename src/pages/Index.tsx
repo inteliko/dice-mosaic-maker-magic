@@ -258,8 +258,9 @@ const Index = () => {
       
       <Footer />
       
-      {/* Add custom styles for the fixed preview */}
-      <style jsx="true">{`
+      {/* Fixed styling for the preview container */}
+      <style>
+        {`
         .fixed-preview {
           max-height: 70vh;
           overflow: hidden;
@@ -279,7 +280,8 @@ const Index = () => {
             max-height: 50vh;
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

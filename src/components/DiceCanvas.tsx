@@ -23,8 +23,12 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     const cols = diceGrid[0].length;
     
     // Adjust cell size based on grid dimensions for better visibility
-    const maxCanvasSize = Math.min(window.innerWidth * 0.8, 800);
-    const cellSize = Math.min(maxCanvasSize / cols, maxCanvasSize / rows);
+    const maxCanvasWidth = Math.min(window.innerWidth * 0.8, 800);
+    const maxCanvasHeight = Math.min(window.innerHeight * 0.6, 600);
+    
+    const cellSizeByWidth = maxCanvasWidth / cols;
+    const cellSizeByHeight = maxCanvasHeight / rows;
+    const cellSize = Math.min(cellSizeByWidth, cellSizeByHeight);
     
     canvas.width = cols * cellSize;
     canvas.height = rows * cellSize;
