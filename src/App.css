@@ -151,6 +151,13 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
+
+  /* Prevent text overflow on buttons */
+  button span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 /* Additional fixes for the preview container */
@@ -164,4 +171,26 @@
 .dice-preview-scroll {
   overflow-y: auto;
   max-height: none;
+}
+
+/* Fix for button text overflow */
+button {
+  overflow: hidden;
+}
+
+button span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Fix for the increase/decrease buttons in calculate page */
+@media (max-width: 768px) {
+  .flex-1 {
+    min-width: 0;
+  }
+
+  button span.truncate {
+    max-width: 100%;
+    display: inline-block;
+  }
 }

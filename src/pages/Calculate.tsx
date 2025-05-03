@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -162,20 +163,20 @@ const Calculate = () => {
                 <div className="flex gap-2 mb-4">
                   <Button 
                     variant="default" 
-                    className="bg-blue-500 hover:bg-blue-600 text-white flex-1"
+                    className="bg-blue-500 hover:bg-blue-600 text-white flex-1 min-w-0"
                     onClick={decreaseSize}
                     disabled={isProcessing}
                   >
-                    <Minus size={16} /> Decrease
+                    <Minus size={16} /> <span className="truncate">Decrease</span>
                   </Button>
                   
                   <Button 
                     variant="default" 
-                    className="bg-blue-500 hover:bg-blue-600 text-white flex-1"
+                    className="bg-blue-500 hover:bg-blue-600 text-white flex-1 min-w-0"
                     onClick={increaseSize}
                     disabled={isProcessing}
                   >
-                    <Plus size={16} /> Increase
+                    <Plus size={16} /> <span className="truncate">Increase</span>
                   </Button>
                 </div>
                 
