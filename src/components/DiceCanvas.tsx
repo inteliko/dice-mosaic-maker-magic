@@ -2,6 +2,7 @@
 import { useRef, useEffect } from "react";
 import { drawDiceFace } from "@/utils/diceDrawing";
 import { MosaicSettings } from "./MosaicControls";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DiceCanvasProps {
   diceGrid: number[][];
@@ -11,6 +12,7 @@ interface DiceCanvasProps {
 
 const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!canvasRef.current || !diceGrid.length) return;
@@ -22,9 +24,9 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     const rows = diceGrid.length;
     const cols = diceGrid[0].length;
     
-    // Adjust cell size based on grid dimensions for better visibility
-    const maxCanvasWidth = Math.min(window.innerWidth * 0.8, 600);
-    const maxCanvasHeight = Math.min(window.innerHeight * 0.5, 400);
+    // Adjust cell size based on grid dimensions and device type
+    const maxCanvasWidth = isMobile ? window.innerWidth * 0.9 : Math.min(window.innerWidth * 0.8, 600);
+    const maxCanvasHeight = isMobile ? window.innerHeight * 0.4 : Math.min(window.innerHeight * 0.5, 400);
     
     const cellSizeByWidth = maxCanvasWidth / cols;
     const cellSizeByHeight = maxCanvasHeight / rows;
@@ -67,7 +69,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     }
 
     onCanvasReady(canvas);
-  }, [diceGrid, settings, onCanvasReady]);
+  }, [diceGrid, settings, onCanvasReady, isMobile]);
 
   return (
     <canvas

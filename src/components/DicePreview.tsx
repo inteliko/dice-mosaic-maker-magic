@@ -92,10 +92,10 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
   return (
     <div className="mosaic-preview-container">
       <div className="preview-section">
-        <div className="px-4 py-6">
-          <h3 className="text-center font-semibold">Mosaic Summary</h3>
+        <div className="px-4 py-6 overflow-visible">
+          <h3 className="text-center font-semibold mb-4">Mosaic Preview</h3>
           
-          <div className="canvas-container flex justify-center my-4">
+          <div className="canvas-container flex justify-center mb-6">
             <DiceCanvas
               diceGrid={diceGrid}
               settings={settings}
@@ -136,22 +136,24 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
             </div>
           </div>
           
-          <div className="text-center mt-6">
+          <div className="text-center my-6">
             <DiceDownloadButtons
               onDownloadImage={downloadImage}
               onDownloadCSV={downloadCSV}
             />
           </div>
           
-          <MosaicSummary
-            width={(width * 6)}
-            height={(height * 6)}
-            blackDiceCount={blackDiceCount}
-            whiteDiceCount={whiteDiceCount}
-            isVisible={true}
-            onDownloadImage={downloadImage}
-            diceColors={diceColorCounts}
-          />
+          <div className="mt-8">
+            <MosaicSummary
+              width={(width * 6)}
+              height={(height * 6)}
+              blackDiceCount={blackDiceCount}
+              whiteDiceCount={whiteDiceCount}
+              isVisible={true}
+              onDownloadImage={downloadImage}
+              diceColors={diceColorCounts}
+            />
+          </div>
         </div>
       </div>
     </div>

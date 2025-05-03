@@ -28,20 +28,20 @@ const MosaicSummary = ({
   const estimatedMinutes = Math.floor((totalDice / 10) % 60);
 
   return (
-    <div className="mt-8 space-y-8">
-      <div className="bg-white p-6 rounded-lg border">
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold text-amber-500 text-center mb-4">
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg border shadow-sm">
+        <div className="mb-6">
+          <h3 className="text-xl sm:text-2xl font-bold text-amber-500 text-center mb-4">
             Your Mosaic is looking Great!
           </h3>
-          <p className="text-center text-gray-600">
+          <p className="text-center text-gray-600 text-sm sm:text-base">
             Dice mosaics are an awesome project to keep you entertained and harness your inner creativity! 
             Impress your friends, make a personable gift, or spend some valuable time putting one together 
             with the family. When you are finished, hang it on your wall to show off your amazing skills!
           </p>
         </div>
 
-        <div className="mt-8 mb-4">
+        <div className="mt-6 mb-4">
           <h3 className="font-bold text-lg mb-2">Now what?</h3>
           <ul className="space-y-2 text-left text-sm">
             <li className="flex items-start">
@@ -66,7 +66,7 @@ const MosaicSummary = ({
         <div className="mt-6 flex justify-center">
           <Button 
             onClick={onDownloadImage}
-            className="bg-black text-white hover:bg-gray-800"
+            className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"
           >
             Generate PNG
           </Button>
