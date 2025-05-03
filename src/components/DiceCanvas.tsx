@@ -25,8 +25,9 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     const cols = diceGrid[0].length;
     
     // Adjust cell size based on grid dimensions and device type
-    const maxCanvasWidth = isMobile ? window.innerWidth * 0.9 : Math.min(window.innerWidth * 0.8, 600);
-    const maxCanvasHeight = isMobile ? window.innerHeight * 0.4 : Math.min(window.innerHeight * 0.5, 400);
+    // Smaller scale factor for better visibility
+    const maxCanvasWidth = isMobile ? window.innerWidth * 0.85 : Math.min(window.innerWidth * 0.7, 600);
+    const maxCanvasHeight = isMobile ? window.innerHeight * 0.5 : Math.min(window.innerHeight * 0.6, 400);
     
     const cellSizeByWidth = maxCanvasWidth / cols;
     const cellSizeByHeight = maxCanvasHeight / rows;
@@ -72,11 +73,13 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
   }, [diceGrid, settings, onCanvasReady, isMobile]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="max-w-full h-auto border border-gray-200 shadow-sm"
-      style={{ imageRendering: "pixelated" }}
-    />
+    <div className="dice-canvas-wrapper w-full overflow-x-auto">
+      <canvas
+        ref={canvasRef}
+        className="max-w-full mx-auto border border-gray-200 shadow-sm"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
   );
 };
 

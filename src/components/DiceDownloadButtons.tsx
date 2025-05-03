@@ -12,7 +12,7 @@ const DiceDownloadButtons = ({ onDownloadImage, onDownloadCSV }: DiceDownloadBut
   const isMobile = useIsMobile();
   
   return (
-    <div className={`flex ${isMobile ? 'flex-col' : 'flex-wrap'} gap-4 justify-center my-4`}>
+    <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-wrap'} gap-4 justify-center my-4`}>
       <Button 
         className="bg-black text-white hover:bg-gray-800 flex items-center gap-2 w-full sm:w-auto"
         onClick={onDownloadImage}

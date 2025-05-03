@@ -28,8 +28,8 @@ const MosaicSummary = ({
   const estimatedMinutes = Math.floor((totalDice / 10) % 60);
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg border shadow-sm">
+    <div className="space-y-6 w-full">
+      <div className="bg-white p-4 sm:p-6 rounded-lg border shadow-sm w-full">
         <div className="mb-6">
           <h3 className="text-xl sm:text-2xl font-bold text-amber-500 text-center mb-4">
             Your Mosaic is looking Great!
@@ -63,7 +63,7 @@ const MosaicSummary = ({
           </ul>
         </div>
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex justify-center w-full">
           <Button 
             onClick={onDownloadImage}
             className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto"

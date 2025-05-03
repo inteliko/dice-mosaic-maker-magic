@@ -218,7 +218,7 @@ const Index = () => {
           {/* Preview section - only shown when there's something to preview */}
           <div className="max-w-5xl mx-auto">
             {(isProcessing || showPreview) && (
-              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 mb-16">
+              <div className="bg-white p-2 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200 mb-16 overflow-visible">
                 <h2 className="text-xl font-semibold mb-4 text-black">Preview Your Mosaic</h2>
                 {isProcessing ? (
                   <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-white h-96">
@@ -226,7 +226,7 @@ const Index = () => {
                     <p className="mt-4 text-gray-600">Processing your image...</p>
                   </div>
                 ) : (
-                  <div className="fixed-preview overflow-hidden">
+                  <div className="dice-preview-scroll">
                     <DicePreview 
                       diceGrid={diceGrid} 
                       settings={settings || {
@@ -258,26 +258,45 @@ const Index = () => {
       
       <Footer />
       
-      {/* Fixed styling for the preview container */}
+      {/* Updated styling for the preview container */}
       <style>
         {`
-        .fixed-preview {
-          max-height: 70vh;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-          border-radius: 0.5rem;
+        .dice-preview-scroll {
+          overflow-y: visible;
+          height: auto !important;
+          max-height: none;
         }
         
-        /* Hide the unclear parts by showing only the center of the preview */
+        .fixed-preview {
+          max-height: none !important;
+          overflow: visible !important;
+          height: auto !important;
+        }
+        
         .fixed-preview > div {
           display: flex;
-          justify-content: center;
+          flex-direction: column;
           align-items: center;
+          overflow: visible;
         }
         
-        @media (max-width: 768px) {
-          .fixed-preview {
-            max-height: 50vh;
+        /* Ensure no horizontal overflow on mobile */
+        @media (max-width: 640px) {
+          .mosaic-preview-container {
+            width: 100%;
+            padding: 0 5px;
+            overflow-x: hidden;
+          }
+          
+          .canvas-container {
+            width: 100%;
+            margin: 0 auto;
+          }
+          
+          canvas {
+            max-width: 100%;
+            width: auto !important;
+            height: auto !important;
           }
         }
         `}

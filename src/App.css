@@ -64,13 +64,14 @@
   background-color: #f5f5f5;
 }
 
-/* Responsive mosaic preview styles */
+/* Responsive mosaic preview styles - UPDATED */
 .mosaic-preview-container {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
   padding: 0 15px;
   overflow-y: visible;
+  overflow-x: visible;
 }
 
 @media (max-width: 768px) {
@@ -79,15 +80,14 @@
   }
 }
 
-/* Style for the preview section */
+/* Style for the preview section - UPDATED */
 .preview-section {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   margin: 20px 0 40px;
-  overflow-x: hidden;
-  overflow-y: visible;
-  height: auto;
+  overflow: visible !important;
+  height: auto !important;
 }
 
 .preview-section h3 {
@@ -102,16 +102,16 @@
   padding: 15px 0;
 }
 
-/* Canvas container styling */
+/* Canvas container styling - UPDATED */
 .canvas-container {
-  max-width: 100%;
+  width: 100%;
   overflow-x: auto;
   max-height: none;
 }
 
 .canvas-container canvas {
   max-width: 100%;
-  height: auto;
+  height: auto !important;
   border: 1px solid #eee;
 }
 
@@ -121,10 +121,11 @@
   padding: 3rem 1rem;
 }
 
-/* Fix for the preview display on mobile */
+/* Fix for the preview display - UPDATED */
 .fixed-preview {
   max-height: none !important;
   overflow: visible !important;
+  height: auto !important;
 }
 
 @media (max-width: 640px) {
@@ -150,4 +151,17 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
+}
+
+/* Additional fixes for the preview container */
+.preview-content-wrapper {
+  padding: 0;
+  overflow: visible;
+  height: auto !important;
+}
+
+/* Make sure the preview scrolls if needed */
+.dice-preview-scroll {
+  overflow-y: auto;
+  max-height: none;
 }

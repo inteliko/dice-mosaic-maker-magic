@@ -92,7 +92,7 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
   return (
     <div className="mosaic-preview-container">
       <div className="preview-section">
-        <div className="px-4 py-6 overflow-visible">
+        <div className="px-4 py-6 preview-content-wrapper">
           <h3 className="text-center font-semibold mb-4">Mosaic Preview</h3>
           
           <div className="canvas-container flex justify-center mb-6">
