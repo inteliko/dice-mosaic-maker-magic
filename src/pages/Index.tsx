@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -190,6 +191,30 @@ const Index = () => {
         <HeroSection />
         
         <div className="container mx-auto px-4">
+          {/* Toggle Controls Button - centered at the top where the section header used to be */}
+          <div className="flex justify-center my-6">
+            <button
+              onClick={toggleSidebar}
+              className="bg-black hover:bg-gray-800 text-white rounded-full px-6 py-3 flex items-center gap-2 shadow-md transition-colors duration-300"
+            >
+              {isSidebarOpen ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-panel-left">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="9" y1="3" y2="21"/>
+                  </svg>
+                  Close Controls
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-panel-right">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="15" x2="15" y1="3" y2="21"/>
+                  </svg>
+                  Open Controls
+                </>
+              )}
+            </button>
+          </div>
+          
           {/* Preview section - only shown when there's something to preview */}
           <div className="max-w-5xl mx-auto">
             {(isProcessing || showPreview) && (
