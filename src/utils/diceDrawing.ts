@@ -20,8 +20,8 @@ export const drawDiceFace = (
   size: number,
   faceColor: string
 ) => {
-  // Restore more visible dots for better clarity
-  const dotSize = size * 0.15;
+  // Use well-sized dots for better clarity and visibility
+  const dotSize = size * 0.18;
   const padding = size * 0.2;
   
   // Calculate contrasting color for dots

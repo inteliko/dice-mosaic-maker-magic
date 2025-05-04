@@ -110,7 +110,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
     }
   };
 
-  // Restore previous grid size range from 100 to 10000
+  // Use the grid size range from 100 to 10000
   const minDiceCount = 100;
   const maxDiceCount = 10000;
   
