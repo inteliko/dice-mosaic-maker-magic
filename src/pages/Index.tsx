@@ -45,9 +45,10 @@ const Index = () => {
       
       // Generate mosaic with default settings using black and white color scheme
       const defaultSettings = {
-        gridSize: 20,
+        gridSize: 80, // Updated to generate 6000-7000 dice
         contrast: 50,
         useShading: true,
+        theme: "mixed" as const,
         faceColors: {
           1: "#FFFFFF", // White
           2: "#DDDDDD", // Light Gray
@@ -230,7 +231,7 @@ const Index = () => {
                     <DicePreview 
                       diceGrid={diceGrid} 
                       settings={settings || {
-                        gridSize: 20,
+                        gridSize: 80, // Updated to generate 6000-7000 dice
                         contrast: 50,
                         useShading: true,
                         faceColors: {

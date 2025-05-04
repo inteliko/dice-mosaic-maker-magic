@@ -29,6 +29,17 @@ export const processImage = async (
         width = Math.round(gridSize * aspectRatio);
       }
       
+      // Cap grid dimensions to avoid performance issues
+      const maxDimension = 200; // Avoid excessively large grids
+      if (width > maxDimension) {
+        width = maxDimension;
+        height = Math.round(width / aspectRatio);
+      }
+      if (height > maxDimension) {
+        height = maxDimension;
+        width = Math.round(height * aspectRatio);
+      }
+      
       // Set canvas size to our grid dimensions
       canvas.width = width;
       canvas.height = height;

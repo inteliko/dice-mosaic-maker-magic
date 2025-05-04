@@ -4,8 +4,9 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Ruler, Weight, Move, Circle, Square, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from "lucide-react";
+import { Ruler, Weight, Move, Circle, Square, Dices } from "lucide-react";
 import ColorPicker from "./ColorPicker";
+import { useToast } from "@/hooks/use-toast";
 
 interface MosaicControlsProps {
   onGenerate: (settings: MosaicSettings) => void;
@@ -19,6 +20,7 @@ export interface MosaicSettings {
   contrast: number;
   useShading: boolean;
   faceColors: Record<number, string>;
+  theme?: "black" | "white" | "mixed";
 }
 
 const DEFAULT_COLORS: Record<number, string> = {
@@ -30,13 +32,34 @@ const DEFAULT_COLORS: Record<number, string> = {
   6: "#222222",
 };
 
+const BLACK_COLORS: Record<number, string> = {
+  1: "#222222",
+  2: "#1A1A1A",
+  3: "#151515",
+  4: "#101010",
+  5: "#080808",
+  6: "#000000",
+};
+
+const WHITE_COLORS: Record<number, string> = {
+  1: "#FFFFFF",
+  2: "#F5F5F5",
+  3: "#EEEEEE",
+  4: "#E8E8E8",
+  5: "#E0E0E0",
+  6: "#D8D8D8",
+};
+
 const DICE_SIZE_CM = 1.6;
 
 const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, diceColorCounts = {} }: MosaicControlsProps) => {
-  const [gridSize, setGridSize] = useState(20);
+  const { toast } = useToast();
+  // Changed default grid size to generate approximately 6000-7000 dice (around 80x80)
+  const [gridSize, setGridSize] = useState(80);
   const [contrast, setContrast] = useState(50);
   const [useShading, setUseShading] = useState(true);
   const [faceColors, setFaceColors] = useState<Record<number, string>>({...DEFAULT_COLORS});
+  const [activeTheme, setActiveTheme] = useState<"mixed" | "black" | "white">("mixed");
 
   const handleColorChange = (faceNumber: number, color: string) => {
     setFaceColors((prev) => ({
@@ -51,14 +74,40 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
       contrast,
       useShading,
       faceColors,
+      theme: activeTheme,
     });
   };
 
   const resetToDefaults = () => {
-    setGridSize(20);
+    setGridSize(80);
     setContrast(50);
     setUseShading(true);
     setFaceColors({...DEFAULT_COLORS});
+    setActiveTheme("mixed");
+  };
+
+  const changeTheme = (theme: "mixed" | "black" | "white") => {
+    setActiveTheme(theme);
+    
+    if (theme === "black") {
+      setFaceColors({...BLACK_COLORS});
+      toast({ 
+        title: "Black Dice Theme",
+        description: "Switched to all black dice theme"
+      });
+    } else if (theme === "white") {
+      setFaceColors({...WHITE_COLORS});
+      toast({ 
+        title: "White Dice Theme",
+        description: "Switched to all white dice theme" 
+      });
+    } else {
+      setFaceColors({...DEFAULT_COLORS});
+      toast({ 
+        title: "Mixed Dice Theme",
+        description: "Switched to black & white mixed dice theme" 
+      });
+    }
   };
 
   const totalDice = gridSize * gridSize;
@@ -67,12 +116,12 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
 
   // Dice icons mapping
   const DiceIcons = {
-    1: Dice1,
-    2: Dice2,
-    3: Dice3,
-    4: Dice4,
-    5: Dice5,
-    6: Dice6,
+    1: Circle,
+    2: Circle,
+    3: Circle,
+    4: Circle,
+    5: Circle,
+    6: Square,
   };
 
   return (
@@ -131,6 +180,37 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
             onCheckedChange={setUseShading} 
           />
           <Label htmlFor="use-shading" className="text-sm">Use shading styles</Label>
+        </div>
+      </div>
+
+      {/* New Theme Buttons Section */}
+      <div className="space-y-3">
+        <h3 className="font-medium text-purple-800">Dice Theme</h3>
+        <div className="grid grid-cols-3 gap-2">
+          <Button 
+            variant={activeTheme === "black" ? "default" : "outline"} 
+            className={`p-2 ${activeTheme === "black" ? "bg-black text-white border-black" : "text-black border"}`}
+            onClick={() => changeTheme("black")}
+          >
+            <Square className="w-4 h-4 mr-2" />
+            Black
+          </Button>
+          <Button 
+            variant={activeTheme === "white" ? "default" : "outline"} 
+            className={`p-2 ${activeTheme === "white" ? "bg-white text-black border-gray-300" : "text-black border"}`}
+            onClick={() => changeTheme("white")}
+          >
+            <Circle className="w-4 h-4 mr-2" />
+            White
+          </Button>
+          <Button 
+            variant={activeTheme === "mixed" ? "default" : "outline"} 
+            className={`p-2 ${activeTheme === "mixed" ? "bg-gray-700 text-white" : "text-black border"}`}
+            onClick={() => changeTheme("mixed")}
+          >
+            <Dices className="w-4 h-4 mr-2" />
+            Mixed
+          </Button>
         </div>
       </div>
 
