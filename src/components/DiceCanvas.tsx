@@ -49,7 +49,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     }
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw each dice based on its value
+    // Improved dice rendering with better visibility
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const diceValue = diceGrid[row][col];
@@ -60,17 +60,12 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
         const diceColor = settings.faceColors[diceValue] || "#ffffff";
         ctx.fillStyle = diceColor;
         
-        // For a cleaner look similar to reference images, don't draw borders for very small cells
-        if (cellSize > 1) {
-          ctx.fillRect(x, y, cellSize, cellSize);
-          
-          // Only draw dots if the cell is large enough to be visible
-          if (cellSize > 2 && settings.useShading) {
-            drawDiceFace(ctx, diceValue, x, y, cellSize, diceColor);
-          }
-        } else {
-          // For very small cells, just use the face color directly as a pixel
-          ctx.fillRect(x, y, cellSize, cellSize);
+        // Draw dice with better visibility
+        ctx.fillRect(x, y, cellSize, cellSize);
+        
+        // Draw dots with better visibility threshold
+        if (cellSize > 3 && settings.useShading) {
+          drawDiceFace(ctx, diceValue, x, y, cellSize, diceColor);
         }
       }
     }

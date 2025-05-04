@@ -20,22 +20,20 @@ export const drawDiceFace = (
   size: number,
   faceColor: string
 ) => {
-  // Create smaller, more uniform dots for cleaner appearance
-  const dotSize = size * 0.12;
+  // Restore more visible dots for better clarity
+  const dotSize = size * 0.15;
   const padding = size * 0.2;
   
-  // Calculate contrasting color for dots - use pure black or white for maximum contrast
+  // Calculate contrasting color for dots
   const r = parseInt(faceColor.slice(1, 3), 16);
   const g = parseInt(faceColor.slice(3, 5), 16);
   const b = parseInt(faceColor.slice(5, 7), 16);
   const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
   
-  // Use a sharper contrast threshold for clearer dot visibility
-  const isDark = brightness < 128;
-  ctx.fillStyle = isDark ? "#FFFFFF" : "#000000";
+  // Use clear contrast for better visibility
+  ctx.fillStyle = brightness > 128 ? "#000000" : "#FFFFFF";
   
   // Position dots based on dice value
-  // Uniform, clean dot positioning inspired by reference images
   switch (value) {
     case 1:
       drawDot({ ctx, x: x + size / 2, y: y + size / 2, size: dotSize });

@@ -110,9 +110,9 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
     }
   };
 
-  // Calculate the min/max grid sizes based on target dice count
-  const minDiceCount = 6000;
-  const maxDiceCount = 14000;
+  // Restore previous grid size range from 100 to 10000
+  const minDiceCount = 100;
+  const maxDiceCount = 10000;
   
   // Square root of min and max dice counts to get grid dimensions
   const minGridSize = Math.floor(Math.sqrt(minDiceCount));
@@ -245,7 +245,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
               <div 
                 key={face} 
                 className="flex items-center gap-1 p-2 rounded-lg border" 
-                style={{backgroundColor: faceColors[face], color: face > 3 ? "#fff" : "#000"}}
+                style={{backgroundColor: faceColors[face], color: face > 3 ? '#fff' : '#000'}}
               >
                 <DiceIcon className="w-4 h-4" />
                 <div className="flex flex-col">
