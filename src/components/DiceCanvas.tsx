@@ -41,7 +41,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     
-    // Changed to black background for consistent look
+    // Use pure black background for consistent look
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
@@ -57,20 +57,29 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady }: DiceCanvasProps) => {
         ctx.fillRect(x, y, cellSize, cellSize);
         
         // Only draw grid lines if cellSize is large enough
+        // Improved contrast for the grid lines
         if (cellSize > 0.5) {
-          ctx.strokeStyle = "#555555";
-          ctx.lineWidth = cellSize > 2 ? 0.2 : 0.1;
+          ctx.strokeStyle = settings.theme === "white" ? "#999999" : "#555555";
+          ctx.lineWidth = cellSize > 2 ? 0.3 : 0.15;
           ctx.strokeRect(x, y, cellSize, cellSize);
         }
         
-        // Only draw dice dots if they would be visible (cell size > 3px)
+        // Improved visibility for dice dots
         if (settings.useShading && cellSize > 3) {
           drawDiceFace(ctx, diceValue, x, y, cellSize, settings.faceColors[diceValue]);
         } else if (cellSize > 2) {
-          // For smaller cells just show a number
-          const isDark = diceValue > 3;
-          ctx.fillStyle = isDark ? "#ffffff" : "#000000";
-          ctx.font = `${cellSize * 0.4}px Arial`; 
+          // For smaller cells just show a number with better contrast
+          // Determine if the background is dark to choose text color with better contrast
+          const r = parseInt(settings.faceColors[diceValue].slice(1, 3), 16);
+          const g = parseInt(settings.faceColors[diceValue].slice(3, 5), 16);
+          const b = parseInt(settings.faceColors[diceValue].slice(5, 7), 16);
+          const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+          
+          // Using a sharper contrast threshold for better visibility
+          const isDark = brightness < 150;
+          
+          ctx.fillStyle = isDark ? "#FFFFFF" : "#000000";
+          ctx.font = `bold ${cellSize * 0.5}px Arial`; 
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(diceValue.toString(), x + cellSize / 2, y + cellSize / 2);

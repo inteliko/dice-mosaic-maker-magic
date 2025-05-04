@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -32,30 +31,31 @@ const DEFAULT_COLORS: Record<number, string> = {
   6: "#222222",
 };
 
+// Enhanced colors for better visibility
 const BLACK_COLORS: Record<number, string> = {
-  1: "#222222",
-  2: "#1A1A1A",
-  3: "#151515",
-  4: "#101010",
-  5: "#080808",
-  6: "#000000",
+  1: "#222222", // Dark gray
+  2: "#1A1A1A", // Darker gray
+  3: "#151515", // Very dark gray
+  4: "#101010", // Almost black
+  5: "#080808", // Nearly black
+  6: "#000000", // Pure black
 };
 
 const WHITE_COLORS: Record<number, string> = {
-  1: "#FFFFFF",
-  2: "#F5F5F5",
-  3: "#EEEEEE",
-  4: "#E8E8E8",
-  5: "#E0E0E0",
-  6: "#D8D8D8",
+  1: "#FFFFFF", // Pure white
+  2: "#F5F5F5", // Almost white
+  3: "#EEEEEE", // Very light gray
+  4: "#E8E8E8", // Light gray
+  5: "#E0E0E0", // Light-medium gray
+  6: "#D8D8D8", // Medium gray
 };
 
 const DICE_SIZE_CM = 1.6;
 
 const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, diceColorCounts = {} }: MosaicControlsProps) => {
   const { toast } = useToast();
-  // Changed default grid size to generate approximately 6000-7000 dice (around 80x80)
-  const [gridSize, setGridSize] = useState(80);
+  // Changed default grid size - square root of 6000-7000 dice is ~77-84
+  const [gridSize, setGridSize] = useState(80); 
   const [contrast, setContrast] = useState(50);
   const [useShading, setUseShading] = useState(true);
   const [faceColors, setFaceColors] = useState<Record<number, string>>({...DEFAULT_COLORS});
@@ -110,6 +110,14 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
     }
   };
 
+  // Calculate the min/max grid sizes based on target dice count
+  const minDiceCount = 6000;
+  const maxDiceCount = 14000;
+  
+  // Square root of min and max dice counts to get grid dimensions
+  const minGridSize = Math.floor(Math.sqrt(minDiceCount));
+  const maxGridSize = Math.ceil(Math.sqrt(maxDiceCount));
+  
   const totalDice = gridSize * gridSize;
   const widthCm = gridSize * DICE_SIZE_CM;
   const heightCm = gridSize * DICE_SIZE_CM;
@@ -136,8 +144,8 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
           </div>
           <Slider 
             id="grid-size"
-            min={10} 
-            max={100} 
+            min={minGridSize} 
+            max={maxGridSize} 
             step={1} 
             value={[gridSize]} 
             onValueChange={(values) => setGridSize(values[0])} 
@@ -183,7 +191,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
         </div>
       </div>
 
-      {/* New Theme Buttons Section */}
+      {/* Theme Buttons Section with improved visual clarity */}
       <div className="space-y-3">
         <h3 className="font-medium text-purple-800">Dice Theme</h3>
         <div className="grid grid-cols-3 gap-2">

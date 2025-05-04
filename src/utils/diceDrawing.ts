@@ -20,7 +20,8 @@ export const drawDiceFace = (
   size: number,
   faceColor: string
 ) => {
-  const dotSize = size * 0.12;
+  // Larger dot size for better visibility
+  const dotSize = size * 0.15;
   const padding = size * 0.2;
   
   // Calculate contrasting color for dots - always black or white
@@ -28,7 +29,7 @@ export const drawDiceFace = (
   const g = parseInt(faceColor.slice(3, 5), 16);
   const b = parseInt(faceColor.slice(5, 7), 16);
   const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
-  // Use a sharper contrast threshold for the black and white theme
+  // Use a sharper contrast threshold for the dice dots
   const isDark = brightness < 150;
   ctx.fillStyle = isDark ? "#FFFFFF" : "#000000";
   
