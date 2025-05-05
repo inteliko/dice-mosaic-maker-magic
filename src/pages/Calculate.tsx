@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,7 @@ const Calculate = () => {
     gridSize: DEFAULT_SIZE,
     contrast: 50,
     useShading: true,
+    diceSizeMm: 1.6,
     faceColors: {
       1: "#FFFFFF",
       2: "#DDDDDD",
