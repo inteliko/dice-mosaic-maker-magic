@@ -5,6 +5,8 @@ import { MosaicSettings } from "./MosaicControls";
 import DiceCanvas from "./DiceCanvas";
 import MosaicSummary from "./MosaicSummary";
 import DiceDownloadButtons from "./DiceDownloadButtons";
+import { ZoomIn, ZoomOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DicePreviewProps {
   diceGrid: number[][];
@@ -16,6 +18,7 @@ interface DicePreviewProps {
 
 const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVisible }: DicePreviewProps) => {
   const [currentCanvas, setCurrentCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const { toast } = useToast();
 
   if (!isVisible) {
@@ -69,6 +72,28 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     });
   };
 
+  const increaseZoom = () => {
+    if (zoomLevel < 5) {
+      const newZoomLevel = Math.min(zoomLevel + 0.5, 5);
+      setZoomLevel(newZoomLevel);
+      toast({
+        title: "Zoom In",
+        description: `Zoom level: ${newZoomLevel.toFixed(1)}x`,
+      });
+    }
+  };
+
+  const decreaseZoom = () => {
+    if (zoomLevel > 0.5) {
+      const newZoomLevel = Math.max(zoomLevel - 0.5, 0.5);
+      setZoomLevel(newZoomLevel);
+      toast({
+        title: "Zoom Out",
+        description: `Zoom level: ${newZoomLevel.toFixed(1)}x`,
+      });
+    }
+  };
+
   // Calculate dice counts by face value
   const diceColorCounts: Record<string, number> = {};
   diceGrid.forEach(row => {
@@ -93,13 +118,41 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     <div className="mosaic-preview-container">
       <div className="preview-section">
         <div className="px-4 py-6 preview-content-wrapper">
-          <h3 className="text-center font-semibold mb-4">Mosaic Preview</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold">Mosaic Preview</h3>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={decreaseZoom}
+                className="flex items-center gap-1"
+                title="Zoom out"
+              >
+                <ZoomOut className="w-4 h-4" />
+                <span className="sr-only md:not-sr-only md:inline">Zoom Out</span>
+              </Button>
+              <span className="px-2 py-1 text-sm bg-gray-100 rounded">
+                {zoomLevel.toFixed(1)}x
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={increaseZoom}
+                className="flex items-center gap-1"
+                title="Zoom in"
+              >
+                <ZoomIn className="w-4 h-4" />
+                <span className="sr-only md:not-sr-only md:inline">Zoom In</span>
+              </Button>
+            </div>
+          </div>
           
           <div className="canvas-container flex justify-center mb-6">
             <DiceCanvas
               diceGrid={diceGrid}
               settings={settings}
               onCanvasReady={setCurrentCanvas}
+              zoomLevel={zoomLevel}
             />
           </div>
           
