@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -45,7 +44,8 @@ const Index = () => {
       
       // Generate mosaic with default settings using black and white color scheme
       const defaultSettings = {
-        gridSize: 80, // Updated to generate 6000-7000 dice
+        gridSize: "auto" as const, // Use automatic grid sizing
+        diceSizeMm: 1.6, // Standard dice size
         contrast: 50,
         useShading: true,
         theme: "mixed" as const,
@@ -105,7 +105,9 @@ const Index = () => {
     setSettings(newSettings);
     
     if (!imageFile) {
-      const sampleGrid = generateSampleGrid(newSettings.gridSize);
+      // For sample grid, use a reasonable fixed size if auto is selected
+      const sampleGridSize = newSettings.gridSize === "auto" ? 80 : newSettings.gridSize;
+      const sampleGrid = generateSampleGrid(sampleGridSize);
       setDiceGrid(sampleGrid);
       const counts = countDiceColors(sampleGrid, newSettings.faceColors);
       setBlackDiceCount(counts.black);
@@ -192,7 +194,7 @@ const Index = () => {
         <HeroSection />
         
         <div className="container mx-auto px-4">
-          {/* Toggle Controls Button - centered at the top where the section header used to be */}
+          {/* Toggle Controls Button - centered at the top */}
           <div className="flex justify-center my-6">
             <button
               onClick={toggleSidebar}
@@ -231,7 +233,8 @@ const Index = () => {
                     <DicePreview 
                       diceGrid={diceGrid} 
                       settings={settings || {
-                        gridSize: 80, // Updated to generate 6000-7000 dice
+                        gridSize: "auto",
+                        diceSizeMm: 1.6,
                         contrast: 50,
                         useShading: true,
                         faceColors: {

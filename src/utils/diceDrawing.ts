@@ -21,7 +21,7 @@ export const drawDiceFace = (
   faceColor: string
 ) => {
   // Improved dot sizing for better clarity
-  const dotSize = size * 0.2;
+  const dotSize = size * 0.18; // Slightly smaller for cleaner appearance
   const padding = size * 0.2;
   
   // Calculate contrasting color for dots with improved algorithm
@@ -37,10 +37,10 @@ export const drawDiceFace = (
   ctx.shadowBlur = 0;
   ctx.lineWidth = 0;
   
-  // Position dots based on dice value
+  // Position dots based on dice value with improved positioning
   switch (value) {
     case 1:
-      drawDot({ ctx, x: x + size / 2, y: y + size / 2, size: dotSize });
+      drawDot({ ctx, x: x + size / 2, y: y + size / 2, size: dotSize * 1.2 }); // Center dot slightly larger
       break;
     case 2:
       drawDot({ ctx, x: x + padding, y: y + padding, size: dotSize });

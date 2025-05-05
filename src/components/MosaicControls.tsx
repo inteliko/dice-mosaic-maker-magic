@@ -15,7 +15,8 @@ interface MosaicControlsProps {
 }
 
 export interface MosaicSettings {
-  gridSize: number;
+  gridSize: number | "auto";
+  diceSizeMm: number;
   contrast: number;
   useShading: boolean;
   faceColors: Record<number, string>;
@@ -50,16 +51,15 @@ const WHITE_COLORS: Record<number, string> = {
   6: "#D8D8D8", // Medium gray
 };
 
-const DICE_SIZE_CM = 1.6;
-
 const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, diceColorCounts = {} }: MosaicControlsProps) => {
   const { toast } = useToast();
-  // Changed default grid size - square root of 6000-7000 dice is ~77-84
-  const [gridSize, setGridSize] = useState(80); 
+  const [gridSize, setGridSize] = useState<number | "auto">("auto"); 
+  const [diceSizeMm, setDiceSizeMm] = useState(1.6); // Standard dice size 1.6cm
   const [contrast, setContrast] = useState(50);
   const [useShading, setUseShading] = useState(true);
   const [faceColors, setFaceColors] = useState<Record<number, string>>({...DEFAULT_COLORS});
   const [activeTheme, setActiveTheme] = useState<"mixed" | "black" | "white">("mixed");
+  const [showManualGridSize, setShowManualGridSize] = useState(false);
 
   const handleColorChange = (faceNumber: number, color: string) => {
     setFaceColors((prev) => ({
@@ -71,6 +71,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
   const handleGenerate = () => {
     onGenerate({
       gridSize,
+      diceSizeMm,
       contrast,
       useShading,
       faceColors,
@@ -79,11 +80,13 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
   };
 
   const resetToDefaults = () => {
-    setGridSize(80);
+    setGridSize("auto");
+    setDiceSizeMm(1.6);
     setContrast(50);
     setUseShading(true);
     setFaceColors({...DEFAULT_COLORS});
     setActiveTheme("mixed");
+    setShowManualGridSize(false);
   };
 
   const changeTheme = (theme: "mixed" | "black" | "white") => {
@@ -110,17 +113,12 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
     }
   };
 
-  // Use the grid size range from 100 to 10000
-  const minDiceCount = 100;
-  const maxDiceCount = 10000;
+  // Calc estimated dice count for auto mode (approximate for display)
+  const estimatedDiceCount = gridSize === "auto" ? 6000 : gridSize * gridSize;
   
-  // Square root of min and max dice counts to get grid dimensions
-  const minGridSize = Math.floor(Math.sqrt(minDiceCount));
-  const maxGridSize = Math.ceil(Math.sqrt(maxDiceCount));
-  
-  const totalDice = gridSize * gridSize;
-  const widthCm = gridSize * DICE_SIZE_CM;
-  const heightCm = gridSize * DICE_SIZE_CM;
+  // Calculate dimensions in cm
+  const widthCm = typeof gridSize === "number" ? gridSize * (diceSizeMm / 10) : "Auto";
+  const heightCm = typeof gridSize === "number" ? gridSize * (diceSizeMm / 10) : "Auto";
 
   // Dice icons mapping
   const DiceIcons = {
@@ -137,33 +135,69 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
       <div className="space-y-3">
         <h3 className="font-medium text-purple-800">Grid Settings</h3>
         
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="grid-size" className="text-sm">Grid Size: {gridSize}×{gridSize}</Label>
-            <span className="text-xs text-gray-500">{totalDice} dice</span>
+        <div className="space-y-1">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="grid-mode" className="text-sm">Grid Size</Label>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowManualGridSize(!showManualGridSize)}
+              className="text-xs text-purple-600"
+            >
+              {showManualGridSize ? "Use Auto Size" : "Set Manual Size"}
+            </Button>
           </div>
-          <Slider 
-            id="grid-size"
-            min={minGridSize} 
-            max={maxGridSize} 
-            step={1} 
-            value={[gridSize]} 
-            onValueChange={(values) => setGridSize(values[0])} 
-            className="py-2"
-          />
+
+          {showManualGridSize ? (
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-xs">Manual Size:</span>
+                <span className="text-xs text-gray-500">
+                  {typeof gridSize === "number" ? `${gridSize}×${gridSize} (${gridSize * gridSize} dice)` : "Auto"}
+                </span>
+              </div>
+              <Slider 
+                id="grid-size"
+                min={10} 
+                max={150} 
+                step={5} 
+                value={[typeof gridSize === "number" ? gridSize : 80]} 
+                onValueChange={(values) => setGridSize(values[0])} 
+                className="py-2"
+              />
+            </div>
+          ) : (
+            <div className="py-2 px-3 bg-gray-100 rounded-md text-center text-sm">
+              Automatic grid sizing based on image
+              <div className="text-xs text-gray-500 mt-1">~6000 dice (optimized)</div>
+            </div>
+          )}
+          
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="dice-size" className="text-sm">Dice Size: {diceSizeMm} mm</Label>
+            <Slider 
+              id="dice-size"
+              min={1.6} 
+              max={3.0} 
+              step={0.1} 
+              value={[diceSizeMm]} 
+              onValueChange={(values) => setDiceSizeMm(values[0])} 
+              className="py-2"
+            />
+          </div>
           
           <div className="grid grid-cols-1 gap-3 mt-2 text-xs text-gray-600">
             <div className="flex items-center gap-2">
               <Move className="w-4 h-4" />
-              <span>Width: {widthCm.toFixed(1)} cm</span>
+              <span>Width: {typeof widthCm === "string" ? widthCm : widthCm.toFixed(1)} cm</span>
             </div>
             <div className="flex items-center gap-2">
               <Weight className="w-4 h-4" />
-              <span>Height: {heightCm.toFixed(1)} cm</span>
+              <span>Height: {typeof heightCm === "string" ? heightCm : heightCm.toFixed(1)} cm</span>
             </div>
             <div className="flex items-center gap-2">
               <Ruler className="w-4 h-4" />
-              <span>Dice Size: {DICE_SIZE_CM} cm</span>
+              <span>Dice Size: {diceSizeMm.toFixed(1)} mm</span>
             </div>
           </div>
         </div>
@@ -187,11 +221,11 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
             checked={useShading} 
             onCheckedChange={setUseShading} 
           />
-          <Label htmlFor="use-shading" className="text-sm">Use shading styles</Label>
+          <Label htmlFor="use-shading" className="text-sm">Show dice dots</Label>
         </div>
       </div>
 
-      {/* Theme Buttons Section with improved visual clarity */}
+      {/* Theme Buttons Section */}
       <div className="space-y-3">
         <h3 className="font-medium text-purple-800">Dice Theme</h3>
         <div className="grid grid-cols-3 gap-2">

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MosaicSettings } from "./MosaicControls";
@@ -28,7 +27,27 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
   const downloadImage = () => {
     if (!currentCanvas) return;
     
-    const dataUrl = currentCanvas.toDataURL("image/png");
+    // Create a high-resolution version for download
+    const downloadCanvas = document.createElement("canvas");
+    const ctx = downloadCanvas.getContext("2d");
+    if (!ctx) return;
+    
+    // Set higher resolution for download
+    const scaleFactor = 2; // Double resolution for downloads
+    downloadCanvas.width = currentCanvas.width * scaleFactor;
+    downloadCanvas.height = currentCanvas.height * scaleFactor;
+    
+    // Draw with high quality
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(
+      currentCanvas, 
+      0, 0, currentCanvas.width, currentCanvas.height,
+      0, 0, downloadCanvas.width, downloadCanvas.height
+    );
+    
+    // Generate high-quality PNG
+    const dataUrl = downloadCanvas.toDataURL("image/png", 1.0);
     const a = document.createElement("a");
     a.href = dataUrl;
     a.download = "dice-mosaic.png";
@@ -38,7 +57,7 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     
     toast({
       title: "Download started",
-      description: "Your dice mosaic image has been downloaded.",
+      description: "Your high-resolution dice mosaic image has been downloaded.",
     });
   };
 
@@ -111,8 +130,14 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     );
   }
 
-  const width = settings.gridSize * diceGrid[0].length / 10;
-  const height = settings.gridSize * diceGrid.length / 10;
+  // Calculate dimensions based on dice size
+  const diceSizeCm = settings.diceSizeMm / 10;
+  const width = typeof settings.gridSize === "number" 
+    ? settings.gridSize * diceSizeCm 
+    : diceGrid[0].length * diceSizeCm;
+  const height = typeof settings.gridSize === "number" 
+    ? settings.gridSize * diceSizeCm 
+    : diceGrid.length * diceSizeCm;
 
   return (
     <div className="mosaic-preview-container">
@@ -159,13 +184,18 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
           <div className="mosaic-info-grid mt-6">
             <div className="grid grid-cols-2 gap-2 text-sm max-w-md mx-auto">
               <div className="text-left">Dice Size</div>
-              <div className="text-right font-medium">{settings.gridSize} mm</div>
+              <div className="text-right font-medium">{settings.diceSizeMm} mm</div>
               
               <div className="text-left">Width</div>
-              <div className="text-right font-medium">{(width * 6).toFixed(2)} cm</div>
+              <div className="text-right font-medium">{width.toFixed(2)} cm</div>
               
               <div className="text-left">Height</div>
-              <div className="text-right font-medium">{(height * 6).toFixed(2)} cm</div>
+              <div className="text-right font-medium">{height.toFixed(2)} cm</div>
+              
+              <div className="text-left">Total Dice</div>
+              <div className="text-right font-medium">
+                {diceGrid.length * diceGrid[0].length}
+              </div>
               
               <div className="text-left">Estimated Time</div>
               <div className="text-right font-medium">
@@ -198,8 +228,8 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
           
           <div className="mt-8">
             <MosaicSummary
-              width={(width * 6)}
-              height={(height * 6)}
+              width={width}
+              height={height}
               blackDiceCount={blackDiceCount}
               whiteDiceCount={whiteDiceCount}
               isVisible={true}

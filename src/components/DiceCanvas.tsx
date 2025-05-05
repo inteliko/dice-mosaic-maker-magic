@@ -21,15 +21,15 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
     if (!canvasRef.current || !diceGrid.length) return;
     
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
     
     const rows = diceGrid.length;
     const cols = diceGrid[0].length;
     
     // Adjust cell size based on grid dimensions and device type
-    const maxCanvasWidth = isMobile ? window.innerWidth * 0.85 : Math.min(window.innerWidth * 0.7, 800);
-    const maxCanvasHeight = isMobile ? window.innerHeight * 0.5 : Math.min(window.innerHeight * 0.6, 600);
+    const maxCanvasWidth = isMobile ? window.innerWidth * 0.85 : Math.min(window.innerWidth * 0.7, 1200);
+    const maxCanvasHeight = isMobile ? window.innerHeight * 0.5 : Math.min(window.innerHeight * 0.6, 900);
     
     // Calculate cell size based on available space and grid size
     const cellSizeByWidth = maxCanvasWidth / cols;
@@ -39,16 +39,27 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
     // Store original cell size for reference
     setOriginalCellSize(cellSize);
     
-    // Apply zoom to cell size
+    // Apply zoom to cell size with increased resolution multiplier
     const zoomedCellSize = cellSize * zoomLevel;
     
+    // Set canvas dimensions with high resolution multiplier (2x)
+    const resolutionMultiplier = 2; // Increased resolution for better image quality
     const canvasWidth = cols * zoomedCellSize;
     const canvasHeight = rows * zoomedCellSize;
     
-    // Update canvas size with zoom effect
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    // Set the physical canvas size to the displayed size
+    canvas.width = canvasWidth * resolutionMultiplier;
+    canvas.height = canvasHeight * resolutionMultiplier;
+    
+    // Set the CSS size (display size)
     setCanvasSize({ width: canvasWidth, height: canvasHeight });
+    
+    // Enable high quality rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    
+    // Scale the context to match the resolution multiplier
+    ctx.scale(resolutionMultiplier, resolutionMultiplier);
     
     // Fill canvas with theme-appropriate background
     if (settings.theme === "black") {
@@ -58,9 +69,9 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
     } else {
       ctx.fillStyle = "#FFFFFF"; // Default background for mixed theme
     }
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     
-    // Draw each dice cell with appropriate styling - with improved resolution
+    // Draw each dice cell with improved styling and resolution
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const diceValue = diceGrid[row][col];
@@ -75,8 +86,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
         const padding = zoomedCellSize * 0.03;
         ctx.fillRect(x + padding, y + padding, zoomedCellSize - padding * 2, zoomedCellSize - padding * 2);
         
-        // Draw the dots if cell is large enough and shading is enabled
-        // Improved threshold for visibility based on zoom
+        // Draw the dots with improved visibility
         if (zoomedCellSize > 4 && settings.useShading) {
           drawDiceFace(ctx, diceValue, x, y, zoomedCellSize, diceColor);
         }
@@ -92,11 +102,10 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
         ref={canvasRef}
         className="max-w-full mx-auto border border-gray-200 shadow-sm"
         style={{ 
-          imageRendering: "pixelated",
-          backgroundColor: settings.theme === "white" ? "#F8F8F8" : 
-                         settings.theme === "black" ? "#111111" : "#FFFFFF",
           width: canvasSize.width > 0 ? canvasSize.width : "auto",
           height: canvasSize.height > 0 ? canvasSize.height : "auto",
+          backgroundColor: settings.theme === "white" ? "#F8F8F8" : 
+                         settings.theme === "black" ? "#111111" : "#FFFFFF",
         }}
       />
     </div>
