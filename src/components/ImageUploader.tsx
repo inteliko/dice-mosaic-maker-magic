@@ -42,6 +42,13 @@ const ImageUploader = ({ onImageUpload, id }: ImageUploaderProps) => {
       return;
     }
 
+    // Notify user that processing has started
+    toast({
+      title: "Processing image",
+      description: "Please wait while we convert your image to dice...",
+    });
+
+    // Send the valid file to the parent component for immediate processing
     onImageUpload(file);
   };
 

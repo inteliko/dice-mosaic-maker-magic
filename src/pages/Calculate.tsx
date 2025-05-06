@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -149,8 +148,16 @@ const Calculate = () => {
   };
 
   const handleImageUpload = async (file: File) => {
-    setImageFile(file);
-    await processCurrentImage();
+    // Check if this is a real file (not an empty file used for clearing)
+    if (file.size > 0) {
+      setImageFile(file);
+      // Process the image immediately after upload
+      await processCurrentImage();
+    } else {
+      // Clear the current image if an empty file was provided
+      setImageFile(null);
+      setDiceGrid([]);
+    }
   };
 
   const increaseSize = () => {
