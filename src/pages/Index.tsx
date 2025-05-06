@@ -105,9 +105,20 @@ const Index = () => {
     setSettings(newSettings);
     
     if (!imageFile) {
-      // For sample grid, use a reasonable fixed size if auto is selected
-      const sampleGridSize = newSettings.gridSize === "auto" ? 80 : newSettings.gridSize;
-      const sampleGrid = generateSampleGrid(sampleGridSize);
+      // For sample grid, handle both square and custom grid sizes
+      let sampleGridWidth, sampleGridHeight;
+      if (newSettings.gridSize === "custom" && newSettings.gridWidth && newSettings.gridHeight) {
+        sampleGridWidth = newSettings.gridWidth;
+        sampleGridHeight = newSettings.gridHeight;
+      } else if (newSettings.gridSize === "auto") {
+        sampleGridWidth = 80;
+        sampleGridHeight = 80;
+      } else {
+        sampleGridWidth = newSettings.gridSize as number;
+        sampleGridHeight = newSettings.gridSize as number;
+      }
+      
+      const sampleGrid = generateSampleGrid(sampleGridWidth, sampleGridHeight);
       setDiceGrid(sampleGrid);
       const counts = countDiceColors(sampleGrid, newSettings.faceColors);
       setBlackDiceCount(counts.black);
@@ -123,7 +134,9 @@ const Index = () => {
       const grid = await processImage(
         imageFile, 
         newSettings.gridSize,
-        newSettings.contrast
+        newSettings.contrast,
+        newSettings.gridWidth,
+        newSettings.gridHeight
       );
       setDiceGrid(grid);
       const counts = countDiceColors(grid, newSettings.faceColors);

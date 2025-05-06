@@ -4,8 +4,10 @@
  */
 export const processImage = async (
   imageFile: File,
-  gridSize: number | "auto",
-  contrast: number
+  gridSize: number | "auto" | "custom",
+  contrast: number,
+  gridWidth?: number,
+  gridHeight?: number
 ): Promise<number[][]> => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -21,32 +23,45 @@ export const processImage = async (
       // Determine dimensions and optimal grid size
       const aspectRatio = img.width / img.height;
       
-      // If auto mode, determine optimal grid size based on image dimensions
-      // Base target: around 6000 dice total for high-quality rendering
-      let width = typeof gridSize === "number" ? gridSize : Math.round(Math.sqrt(6000 * aspectRatio));
-      let height = Math.round(width / aspectRatio);
+      // Handle different grid size modes
+      let width: number, height: number;
       
-      // Ensure we maintain a reasonable grid size
-      if (height > width * 2) {
-        height = width;
-        width = Math.round(height * aspectRatio);
-      }
-      
-      // Cap grid dimensions for performance while maintaining quality
-      const maxDimension = 150; // Increased for better quality
-      if (width > maxDimension) {
-        width = maxDimension;
+      if (gridSize === "custom" && gridWidth && gridHeight) {
+        // Use custom width and height settings
+        width = gridWidth;
+        height = gridHeight;
+      } else if (typeof gridSize === "number") {
+        // Use square grid with the specified size
+        width = gridSize;
+        height = gridSize;
+      } else {
+        // Auto mode: determine optimal grid size based on image dimensions
+        // Base target: around 6000 dice total for high-quality rendering
+        width = Math.round(Math.sqrt(6000 * aspectRatio));
         height = Math.round(width / aspectRatio);
+        
+        // Ensure we maintain a reasonable grid size
+        if (height > width * 2) {
+          height = width;
+          width = Math.round(height * aspectRatio);
+        }
+        
+        // Cap grid dimensions for performance while maintaining quality
+        const maxDimension = 150; // Increased for better quality
+        if (width > maxDimension) {
+          width = maxDimension;
+          height = Math.round(width / aspectRatio);
+        }
+        if (height > maxDimension) {
+          height = maxDimension;
+          width = Math.round(height * aspectRatio);
+        }
+        
+        // Ensure minimum dimensions for visibility
+        const minDimension = 50;
+        if (width < minDimension) width = minDimension;
+        if (height < minDimension) height = minDimension;
       }
-      if (height > maxDimension) {
-        height = maxDimension;
-        width = Math.round(height * aspectRatio);
-      }
-      
-      // Ensure minimum dimensions for visibility
-      const minDimension = 50;
-      if (width < minDimension) width = minDimension;
-      if (height < minDimension) height = minDimension;
       
       // Set canvas size to our grid dimensions with 2x scale for better resolution
       canvas.width = width * 2;
@@ -61,9 +76,11 @@ export const processImage = async (
       const imageData = ctx.getImageData(0, 0, width * 2, height * 2);
       const data = imageData.data;
       
-      // Apply contrast for better dot pattern definition
-      // This helps create more defined areas similar to reference images
-      const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+      // Apply contrast - use the actual contrast value from settings
+      // The contrast parameter is now a value between 0-100
+      const contrastValue = contrast * 2 - 100; // Convert 0-100 to -100-100 range
+      const factor = (259 * (contrastValue + 255)) / (255 * (259 - contrastValue));
+      
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
@@ -72,20 +89,15 @@ export const processImage = async (
         // Convert to grayscale with improved luminance formula
         const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
         
-        // Apply enhanced contrast adjustment
+        // Apply the contrast adjustment using the slider value
         const adjustedGray = Math.min(255, Math.max(0, 
-          contrastFactor * (gray - 128) + 128
+          factor * (gray - 128) + 128
         ));
         
-        // Apply adaptive thresholding for more defined areas
-        // This helps create the dotted pattern effect
-        const threshold = 128;
-        const finalGray = adjustedGray > threshold ? 255 : 0;
-        
         // Store back as grayscale
-        data[i] = finalGray;
-        data[i + 1] = finalGray;
-        data[i + 2] = finalGray;
+        data[i] = adjustedGray;
+        data[i + 1] = adjustedGray;
+        data[i + 2] = adjustedGray;
       }
       
       // Put data back to canvas
@@ -139,13 +151,19 @@ export const processImage = async (
         resolve(diceGrid);
       } else {
         // Fallback if final canvas context can't be created
-        resolve(generateRandomGrid(typeof gridSize === "number" ? gridSize : 80));
+        resolve(generateRandomGrid(width, height));
       }
     };
     
     img.onerror = () => {
       // Return a fallback random grid if image can't be loaded
-      resolve(generateRandomGrid(typeof gridSize === "number" ? gridSize : 80));
+      if (gridSize === "custom" && gridWidth && gridHeight) {
+        resolve(generateRandomGrid(gridWidth, gridHeight));
+      } else if (typeof gridSize === "number") {
+        resolve(generateRandomGrid(gridSize, gridSize));
+      } else {
+        resolve(generateRandomGrid(80, 80));
+      }
     };
     
     // Start loading the image
@@ -156,11 +174,11 @@ export const processImage = async (
 /**
  * Generates a random grid of dice values (for testing or fallback)
  */
-export const generateRandomGrid = (size: number): number[][] => {
+export const generateRandomGrid = (width: number, height: number = width): number[][] => {
   const grid: number[][] = [];
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < height; i++) {
     const row: number[] = [];
-    for (let j = 0; j < size; j++) {
+    for (let j = 0; j < width; j++) {
       row.push(Math.floor(Math.random() * 6) + 1);
     }
     grid.push(row);
@@ -171,13 +189,13 @@ export const generateRandomGrid = (size: number): number[][] => {
 /**
  * Generates a sample grid pattern for testing
  */
-export const generateSampleGrid = (size: number): number[][] => {
+export const generateSampleGrid = (width: number, height: number = width): number[][] => {
   const grid: number[][] = [];
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < height; i++) {
     const row: number[] = [];
-    for (let j = 0; j < size; j++) {
+    for (let j = 0; j < width; j++) {
       // Create a gradient pattern
-      const value = Math.floor(((i + j) / (2 * size)) * 6) + 1;
+      const value = Math.floor(((i + j) / (width + height)) * 6) + 1;
       row.push(Math.min(6, Math.max(1, value)));
     }
     grid.push(row);

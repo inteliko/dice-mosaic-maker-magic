@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,8 @@ interface MosaicControlsProps {
 
 export interface MosaicSettings {
   gridSize: number | "auto";
+  gridWidth?: number;
+  gridHeight?: number;
   diceSizeMm: number;
   contrast: number;
   useShading: boolean;
@@ -53,13 +56,16 @@ const WHITE_COLORS: Record<number, string> = {
 
 const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, diceColorCounts = {} }: MosaicControlsProps) => {
   const { toast } = useToast();
-  const [gridSize, setGridSize] = useState<number | "auto">("auto"); 
+  const [gridSize, setGridSize] = useState<number | "auto">("auto");
+  const [gridWidth, setGridWidth] = useState<number>(80);
+  const [gridHeight, setGridHeight] = useState<number>(80);
   const [diceSizeMm, setDiceSizeMm] = useState(1.6); // Standard dice size 1.6cm
   const [contrast, setContrast] = useState(50);
   const [useShading, setUseShading] = useState(true);
   const [faceColors, setFaceColors] = useState<Record<number, string>>({...DEFAULT_COLORS});
   const [activeTheme, setActiveTheme] = useState<"mixed" | "black" | "white">("mixed");
   const [showManualGridSize, setShowManualGridSize] = useState(false);
+  const [independentDimensions, setIndependentDimensions] = useState(false);
 
   const handleColorChange = (faceNumber: number, color: string) => {
     setFaceColors((prev) => ({
@@ -70,7 +76,9 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
 
   const handleGenerate = () => {
     onGenerate({
-      gridSize,
+      gridSize: independentDimensions ? "custom" as any : gridSize,
+      gridWidth: independentDimensions ? gridWidth : typeof gridSize === "number" ? gridSize : undefined,
+      gridHeight: independentDimensions ? gridHeight : typeof gridSize === "number" ? gridSize : undefined,
       diceSizeMm,
       contrast,
       useShading,
@@ -81,12 +89,15 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
 
   const resetToDefaults = () => {
     setGridSize("auto");
+    setGridWidth(80);
+    setGridHeight(80);
     setDiceSizeMm(1.6);
     setContrast(50);
     setUseShading(true);
     setFaceColors({...DEFAULT_COLORS});
     setActiveTheme("mixed");
     setShowManualGridSize(false);
+    setIndependentDimensions(false);
   };
 
   const changeTheme = (theme: "mixed" | "black" | "white") => {
@@ -113,12 +124,25 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
     }
   };
 
-  // Calc estimated dice count for auto mode (approximate for display)
-  const estimatedDiceCount = gridSize === "auto" ? 6000 : gridSize * gridSize;
+  // Calc estimated dice count
+  const estimatedDiceCount = independentDimensions 
+    ? gridWidth * gridHeight 
+    : gridSize === "auto" 
+      ? 6000 
+      : gridSize * gridSize;
   
   // Calculate dimensions in cm
-  const widthCm = typeof gridSize === "number" ? gridSize * (diceSizeMm / 10) : "Auto";
-  const heightCm = typeof gridSize === "number" ? gridSize * (diceSizeMm / 10) : "Auto";
+  const widthCm = independentDimensions
+    ? gridWidth * (diceSizeMm / 10)
+    : typeof gridSize === "number"
+      ? gridSize * (diceSizeMm / 10)
+      : "Auto";
+  
+  const heightCm = independentDimensions
+    ? gridHeight * (diceSizeMm / 10)
+    : typeof gridSize === "number" 
+      ? gridSize * (diceSizeMm / 10)
+      : "Auto";
 
   // Dice icons mapping
   const DiceIcons = {
@@ -138,34 +162,96 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
         <div className="space-y-1">
           <div className="flex justify-between items-center">
             <Label htmlFor="grid-mode" className="text-sm">Grid Size</Label>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowManualGridSize(!showManualGridSize)}
-              className="text-xs text-purple-600"
-            >
-              {showManualGridSize ? "Use Auto Size" : "Set Manual Size"}
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  if (showManualGridSize && independentDimensions) {
+                    setIndependentDimensions(false);
+                    setShowManualGridSize(false);
+                  } else if (showManualGridSize) {
+                    setIndependentDimensions(true);
+                  } else {
+                    setShowManualGridSize(true);
+                  }
+                }}
+                className="text-xs text-purple-600"
+              >
+                {independentDimensions 
+                  ? "Use Square Grid" 
+                  : showManualGridSize 
+                    ? "Use Custom W/H" 
+                    : "Set Manual Size"}
+              </Button>
+              {showManualGridSize && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setShowManualGridSize(false);
+                    setIndependentDimensions(false);
+                  }}
+                  className="text-xs text-purple-600"
+                >
+                  Auto Size
+                </Button>
+              )}
+            </div>
           </div>
 
           {showManualGridSize ? (
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-xs">Manual Size:</span>
-                <span className="text-xs text-gray-500">
-                  {typeof gridSize === "number" ? `${gridSize}×${gridSize} (${gridSize * gridSize} dice)` : "Auto"}
-                </span>
+            independentDimensions ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs">Width: {gridWidth}</span>
+                    <span className="text-xs text-gray-500">
+                      {gridWidth} × {gridHeight} = {gridWidth * gridHeight} dice
+                    </span>
+                  </div>
+                  <Slider 
+                    min={10} 
+                    max={150} 
+                    step={5} 
+                    value={[gridWidth]} 
+                    onValueChange={(values) => setGridWidth(values[0])} 
+                    className="py-2"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs">Height: {gridHeight}</span>
+                  </div>
+                  <Slider 
+                    min={10} 
+                    max={150} 
+                    step={5} 
+                    value={[gridHeight]} 
+                    onValueChange={(values) => setGridHeight(values[0])} 
+                    className="py-2"
+                  />
+                </div>
               </div>
-              <Slider 
-                id="grid-size"
-                min={10} 
-                max={150} 
-                step={5} 
-                value={[typeof gridSize === "number" ? gridSize : 80]} 
-                onValueChange={(values) => setGridSize(values[0])} 
-                className="py-2"
-              />
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-xs">Manual Size:</span>
+                  <span className="text-xs text-gray-500">
+                    {typeof gridSize === "number" ? `${gridSize}×${gridSize} (${gridSize * gridSize} dice)` : "Auto"}
+                  </span>
+                </div>
+                <Slider 
+                  id="grid-size"
+                  min={10} 
+                  max={150} 
+                  step={5} 
+                  value={[typeof gridSize === "number" ? gridSize : 80]} 
+                  onValueChange={(values) => setGridSize(values[0])} 
+                  className="py-2"
+                />
+              </div>
+            )
           ) : (
             <div className="py-2 px-3 bg-gray-100 rounded-md text-center text-sm">
               Automatic grid sizing based on image
