@@ -42,8 +42,8 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
     // Apply zoom to cell size with increased resolution multiplier
     const zoomedCellSize = cellSize * zoomLevel;
     
-    // Set canvas dimensions with high resolution multiplier (2x)
-    const resolutionMultiplier = 2; // Increased resolution for better image quality
+    // Set canvas dimensions with high resolution multiplier (3x for even better quality)
+    const resolutionMultiplier = 3; // Increased resolution for better image quality
     const canvasWidth = cols * zoomedCellSize;
     const canvasHeight = rows * zoomedCellSize;
     
@@ -83,7 +83,7 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
         ctx.fillStyle = diceColor;
         
         // For a cleaner look, draw dice background with small gap between dice
-        const padding = zoomedCellSize * 0.03;
+        const padding = zoomedCellSize * 0.02; // Reduced padding for more accurate image representation
         ctx.fillRect(x + padding, y + padding, zoomedCellSize - padding * 2, zoomedCellSize - padding * 2);
         
         // Draw the dots with improved visibility

@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+
+import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ interface Settings {
   contrast: number;
   useShading: boolean;
   diceSizeMm: number;
+  theme?: string;
   faceColors: {
     1: string;
     2: string;
@@ -75,9 +77,11 @@ const Calculate = () => {
   const whiteDiceCount = diceColorCounts[1] || 0;
   const blackDiceCount = diceColorCounts[6] || 0;
 
-  // Calculate total cost - Using the width * height to get accurate dice count
-  const calculatedDiceCount = width * height;
-  const totalCost = (calculatedDiceCount * dicePrice).toFixed(2);
+  // Calculate actual dice count from the processed grid
+  const actualDiceCount = diceGrid.length > 0 ? diceGrid.length * diceGrid[0].length : width * height;
+  
+  // Calculate total cost using actual dice count
+  const totalCost = (actualDiceCount * dicePrice).toFixed(2);
 
   // Handle price input change
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +137,7 @@ const Calculate = () => {
       
       toast({
         title: "Image processed successfully",
-        description: "Your image has been converted to a dice mosaic pattern.",
+        description: `Your image has been converted to a dice mosaic pattern with ${totalDice} dice.`,
       });
     } catch (error) {
       toast({
@@ -390,7 +394,7 @@ const Calculate = () => {
                 <Label className="text-lg font-medium mb-4 block">Cost Estimate (16mm)</Label>
                 
                 <div className="mb-4">
-                  <p>{calculatedDiceCount} Dice @</p>
+                  <p>{actualDiceCount} Dice @</p>
                 </div>
                 
                 <div className="flex items-center mb-4">
@@ -570,9 +574,9 @@ const Calculate = () => {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="bg-gray-50 p-4 rounded-md">
                   <h3 className="font-semibold mb-2">Dimensions</h3>
-                  <p>Width: {width} dice</p>
-                  <p>Height: {height} dice</p>
-                  <p>Total dice: {width * height}</p>
+                  <p>Width: {diceGrid[0]?.length || width} dice</p>
+                  <p>Height: {diceGrid.length || height} dice</p>
+                  <p>Total dice: {actualDiceCount}</p>
                 </div>
                 
                 <div className="bg-gray-50 p-4 rounded-md">
