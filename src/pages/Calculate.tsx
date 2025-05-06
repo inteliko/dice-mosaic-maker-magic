@@ -18,6 +18,24 @@ const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
 const DEFAULT_SIZE = 50;
 
+// Updated interface to match how settings are actually used
+interface Settings {
+  gridSize: number | "auto" | "custom";
+  gridWidth?: number;
+  gridHeight?: number;
+  contrast: number;
+  useShading: boolean;
+  diceSizeMm: number;
+  faceColors: {
+    1: string;
+    2: string;
+    3: string;
+    4: string;
+    5: string;
+    6: string;
+  };
+}
+
 const Calculate = () => {
   const [width, setWidth] = useState<number>(DEFAULT_SIZE);
   const [height, setHeight] = useState<number>(DEFAULT_SIZE);
@@ -27,7 +45,7 @@ const Calculate = () => {
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [diceCount, setDiceCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<Settings>({
     gridSize: DEFAULT_SIZE,
     contrast: 50,
     useShading: true,
@@ -96,13 +114,14 @@ const Calculate = () => {
       const totalDice = grid.length * grid[0].length;
       setDiceCount(totalDice);
       
+      // Update settings with correctly typed values
       setSettings(prev => ({
         ...prev,
-        gridSize: "custom",
+        gridSize: "custom" as const,
         gridWidth: width,
         gridHeight: height,
         contrast,
-        diceSizeMm: 1.6, // Make sure to include the required property
+        diceSizeMm: 1.6,
       }));
       
       toast({
