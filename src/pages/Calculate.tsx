@@ -14,7 +14,6 @@ import DicePreview from "@/components/DicePreview";
 import DiceCanvas from "@/components/DiceCanvas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
 const DEFAULT_SIZE = 50;
 
@@ -45,6 +44,7 @@ const Calculate = () => {
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [diceCount, setDiceCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [dicePrice, setDicePrice] = useState<number>(0.10);
   const [settings, setSettings] = useState<Settings>({
     gridSize: DEFAULT_SIZE,
     contrast: 50,
@@ -78,7 +78,15 @@ const Calculate = () => {
 
   // Calculate total cost - Using the width * height to get accurate dice count
   const calculatedDiceCount = width * height;
-  const totalCost = (calculatedDiceCount * DICE_PRICE).toFixed(2);
+  const totalCost = (calculatedDiceCount * dicePrice).toFixed(2);
+
+  // Handle price input change
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value) && value >= 0) {
+      setDicePrice(value);
+    }
+  };
 
   const processCurrentImage = async () => {
     if (!imageFile) {
@@ -381,10 +389,12 @@ const Calculate = () => {
                 <div className="flex items-center mb-4">
                   <span className="mr-2">$</span>
                   <Input 
-                    type="text" 
-                    value={DICE_PRICE.toFixed(2)} 
-                    readOnly 
-                    className="w-16 bg-gray-50"
+                    type="number" 
+                    value={dicePrice.toFixed(2)} 
+                    onChange={handlePriceChange}
+                    className="w-16"
+                    step="0.01"
+                    min="0"
                   />
                 </div>
                 
