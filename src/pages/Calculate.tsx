@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ImageUploader from "@/components/ImageUploader";
 import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
-import { FileDown, Plus, Minus } from "lucide-react";
+import { FileDown, Plus, Minus, FileOutput } from "lucide-react";
 import DicePreview from "@/components/DicePreview";
 import DiceCanvas from "@/components/DiceCanvas";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const DICE_PRICE = 0.10;
 const MAX_DICE = 10000;
@@ -39,6 +41,9 @@ const Calculate = () => {
       6: "#222222",
     }
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [outputDialogOpen, setOutputDialogOpen] = useState<boolean>(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { toast } = useToast();
 
   // Calculate counts of each dice face
@@ -57,7 +62,16 @@ const Calculate = () => {
   const calculatedDiceCount = width * height;
   const totalCost = (calculatedDiceCount * DICE_PRICE).toFixed(2);
 
-  const handleImageUpload = async (file: File) => {
+  const processCurrentImage = async () => {
+    if (!imageFile) {
+      toast({
+        title: "No image selected",
+        description: "Please upload an image first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
       toast({
@@ -65,10 +79,17 @@ const Calculate = () => {
         description: "Please wait while we convert your image to dice...",
       });
       
-      // Calculate grid size based on width/height
-      const gridSize = Math.max(width, height);
+      // Use width and height for the custom grid size
+      const grid = await processImage(
+        imageFile, 
+        "custom", 
+        contrast, 
+        width, 
+        height, 
+        brightness, 
+        invertColors
+      );
       
-      const grid = await processImage(file, gridSize, contrast);
       setDiceGrid(grid);
       
       // Count dice
@@ -77,8 +98,11 @@ const Calculate = () => {
       
       setSettings(prev => ({
         ...prev,
-        gridSize,
+        gridSize: "custom",
+        gridWidth: width,
+        gridHeight: height,
         contrast,
+        diceSizeMm: 1.6, // Make sure to include the required property
       }));
       
       toast({
@@ -91,15 +115,24 @@ const Calculate = () => {
         description: "There was an error processing your image. Please try again.",
         variant: "destructive",
       });
+      console.error("Error processing image:", error);
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setImageFile(file);
+    await processCurrentImage();
   };
 
   const increaseSize = () => {
     if (width * height < MAX_DICE) {
       setWidth(prev => Math.min(prev + 10, 100));
       setHeight(prev => Math.min(prev + 10, 100));
+      if (imageFile) {
+        processCurrentImage();
+      }
     } else {
       toast({
         title: "Maximum size reached",
@@ -112,28 +145,131 @@ const Calculate = () => {
   const decreaseSize = () => {
     setWidth(prev => Math.max(prev - 10, 10));
     setHeight(prev => Math.max(prev - 10, 10));
+    if (imageFile) {
+      processCurrentImage();
+    }
   };
 
   const increaseContrast = () => {
     setContrast(prev => Math.min(prev + 10, 100));
+    if (imageFile) {
+      processCurrentImage();
+    }
   };
 
   const decreaseContrast = () => {
     setContrast(prev => Math.max(prev - 10, 0));
+    if (imageFile) {
+      processCurrentImage();
+    }
   };
 
   const increaseBrightness = () => {
     setBrightness(prev => Math.min(prev + 10, 100));
+    if (imageFile) {
+      processCurrentImage();
+    }
   };
 
   const decreaseBrightness = () => {
     setBrightness(prev => Math.max(prev - 10, 0));
+    if (imageFile) {
+      processCurrentImage();
+    }
+  };
+
+  const handleInvertChange = (checked: boolean) => {
+    setInvertColors(checked);
+    if (imageFile) {
+      processCurrentImage();
+    }
   };
 
   const openOutput = () => {
+    if (diceGrid.length === 0) {
+      toast({
+        title: "No dice mosaic generated",
+        description: "Please upload an image and generate a dice mosaic first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setOutputDialogOpen(true);
     toast({
-      title: "Opening output",
-      description: "Preparing dice layout for printing...",
+      title: "Output opened",
+      description: "Showing dice layout for printing.",
+    });
+  };
+
+  const downloadCSV = () => {
+    if (diceGrid.length === 0) return;
+    
+    const headers = ["Row", "Column", "Dice Value"];
+    const csvRows = [headers];
+
+    diceGrid.forEach((row, rowIndex) => {
+      row.forEach((value, colIndex) => {
+        csvRows.push([String(rowIndex + 1), String(colIndex + 1), String(value)]);
+      });
+    });
+
+    const csvContent = csvRows
+      .map(row => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "dice-mosaic.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Download started",
+      description: "Your dice mosaic CSV has been downloaded.",
+    });
+  };
+
+  const downloadPNG = () => {
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    
+    // Create a high-resolution version for download
+    const downloadCanvas = document.createElement("canvas");
+    const ctx = downloadCanvas.getContext("2d");
+    if (!ctx) return;
+    
+    // Set higher resolution for download
+    const scaleFactor = 2; // Double resolution for downloads
+    downloadCanvas.width = canvas.width * scaleFactor;
+    downloadCanvas.height = canvas.height * scaleFactor;
+    
+    // Draw with high quality
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(
+      canvas, 
+      0, 0, canvas.width, canvas.height,
+      0, 0, downloadCanvas.width, downloadCanvas.height
+    );
+    
+    // Generate high-quality PNG
+    const dataUrl = downloadCanvas.toDataURL("image/png", 1.0);
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = "dice-mosaic.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    toast({
+      title: "Download started",
+      description: "Your high-resolution dice mosaic image has been downloaded.",
     });
   };
 
@@ -186,7 +322,11 @@ const Calculate = () => {
                     <Input 
                       type="number" 
                       value={width} 
-                      onChange={e => setWidth(Math.min(parseInt(e.target.value) || 10, 100))} 
+                      onChange={e => {
+                        const newWidth = Math.min(parseInt(e.target.value) || 10, 100);
+                        setWidth(newWidth);
+                        if (imageFile) processCurrentImage();
+                      }} 
                       className="w-24" 
                       disabled={isProcessing}
                     />
@@ -198,7 +338,11 @@ const Calculate = () => {
                     <Input 
                       type="number" 
                       value={height} 
-                      onChange={e => setHeight(Math.min(parseInt(e.target.value) || 10, 100))} 
+                      onChange={e => {
+                        const newHeight = Math.min(parseInt(e.target.value) || 10, 100);
+                        setHeight(newHeight);
+                        if (imageFile) processCurrentImage();
+                      }} 
                       className="w-24" 
                       disabled={isProcessing}
                     />
@@ -238,7 +382,7 @@ const Calculate = () => {
                   <Checkbox 
                     id="invertColors" 
                     checked={invertColors}
-                    onCheckedChange={(checked) => setInvertColors(!!checked)}
+                    onCheckedChange={handleInvertChange}
                   />
                   <label htmlFor="invertColors" className="ml-2 text-sm font-medium">
                     Invert (black dice)
@@ -251,6 +395,7 @@ const Calculate = () => {
                   onClick={openOutput}
                   disabled={diceGrid.length === 0}
                 >
+                  <FileOutput className="w-4 h-4 mr-2" />
                   Open output
                 </Button>
               </div>
@@ -288,7 +433,10 @@ const Calculate = () => {
                   <Input 
                     type="number" 
                     value={contrast} 
-                    onChange={e => setContrast(parseInt(e.target.value) || 0)} 
+                    onChange={e => {
+                      setContrast(parseInt(e.target.value) || 0);
+                      if (imageFile) processCurrentImage();
+                    }} 
                     className="w-16" 
                     disabled={isProcessing}
                   />
@@ -323,7 +471,10 @@ const Calculate = () => {
                   <Input 
                     type="number" 
                     value={brightness} 
-                    onChange={e => setBrightness(parseInt(e.target.value) || 0)} 
+                    onChange={e => {
+                      setBrightness(parseInt(e.target.value) || 0);
+                      if (imageFile) processCurrentImage();
+                    }} 
                     className="w-16" 
                     disabled={isProcessing}
                   />
@@ -343,7 +494,9 @@ const Calculate = () => {
                 <DiceCanvas
                   diceGrid={diceGrid}
                   settings={settings}
-                  onCanvasReady={() => {}}
+                  onCanvasReady={(canvas) => {
+                    canvasRef.current = canvas;
+                  }}
                 />
               </div>
             )}
@@ -360,6 +513,66 @@ const Calculate = () => {
           </Card>
         </div>
       </div>
+
+      {/* Output Dialog */}
+      <Dialog open={outputDialogOpen} onOpenChange={setOutputDialogOpen}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Dice Mosaic Output</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-6">
+            <div className="flex flex-col space-y-4">
+              <div className="border rounded-md p-4 bg-white">
+                <DiceCanvas
+                  diceGrid={diceGrid}
+                  settings={settings}
+                  onCanvasReady={() => {}}
+                />
+              </div>
+              
+              {/* Mosaic Info */}
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <h3 className="font-semibold mb-2">Dimensions</h3>
+                  <p>Width: {width} dice</p>
+                  <p>Height: {height} dice</p>
+                  <p>Total dice: {width * height}</p>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <h3 className="font-semibold mb-2">Dice Distribution</h3>
+                  <p>White dice (1): {diceColorCounts[1] || 0}</p>
+                  <p>Black dice (6): {diceColorCounts[6] || 0}</p>
+                  <p>Total cost: ${totalCost}</p>
+                </div>
+              </div>
+              
+              {/* Download Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button 
+                  onClick={downloadPNG}
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  <FileDown className="w-4 h-4 mr-2" />
+                  Download Image
+                </Button>
+                
+                <Button 
+                  onClick={downloadCSV}
+                  variant="outline"
+                >
+                  <FileDown className="w-4 h-4 mr-2" />
+                  Download CSV
+                </Button>
+              </div>
+              
+              <div className="text-sm text-gray-500 text-center">
+                <p>The CSV file contains the position and value of each dice for manual assembly.</p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

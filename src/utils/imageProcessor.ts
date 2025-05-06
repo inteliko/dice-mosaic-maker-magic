@@ -7,7 +7,9 @@ export const processImage = async (
   gridSize: number | "auto" | "custom",
   contrast: number,
   gridWidth?: number,
-  gridHeight?: number
+  gridHeight?: number,
+  brightness: number = 50,
+  invertColors: boolean = false
 ): Promise<number[][]> => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -76,6 +78,9 @@ export const processImage = async (
       const imageData = ctx.getImageData(0, 0, width * 2, height * 2);
       const data = imageData.data;
       
+      // Apply brightness - convert from 0-100 scale to -100-100 scale
+      const brightnessValue = (brightness - 50) * 2;
+      
       // Apply contrast - use the actual contrast value from settings
       // The contrast parameter is now a value between 0-100
       const contrastValue = contrast * 2 - 100; // Convert 0-100 to -100-100 range
@@ -89,9 +94,12 @@ export const processImage = async (
         // Convert to grayscale with improved luminance formula
         const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
         
+        // Apply brightness adjustment
+        let adjustedGray = Math.min(255, Math.max(0, gray + brightnessValue));
+        
         // Apply the contrast adjustment using the slider value
-        const adjustedGray = Math.min(255, Math.max(0, 
-          factor * (gray - 128) + 128
+        adjustedGray = Math.min(255, Math.max(0, 
+          factor * (adjustedGray - 128) + 128
         ));
         
         // Store back as grayscale
@@ -141,6 +149,11 @@ export const processImage = async (
               diceValue = 2;
             } else {
               diceValue = 1; // Lightest areas get lowest value (fewest dots)
+            }
+            
+            // If invertColors is true, invert the dice values (1 becomes 6, 2 becomes 5, etc.)
+            if (invertColors) {
+              diceValue = 7 - diceValue;
             }
             
             row.push(diceValue);
