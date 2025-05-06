@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -107,15 +108,17 @@ const Index = () => {
     if (!imageFile) {
       // For sample grid, handle both square and custom grid sizes
       let sampleGridWidth, sampleGridHeight;
+      
       if (newSettings.gridSize === "custom" && newSettings.gridWidth && newSettings.gridHeight) {
         sampleGridWidth = newSettings.gridWidth;
         sampleGridHeight = newSettings.gridHeight;
-      } else if (newSettings.gridSize === "auto") {
+      } else if (typeof newSettings.gridSize === "number") {
+        sampleGridWidth = newSettings.gridSize;
+        sampleGridHeight = newSettings.gridSize;
+      } else {
+        // Auto sizing
         sampleGridWidth = 80;
         sampleGridHeight = 80;
-      } else {
-        sampleGridWidth = newSettings.gridSize as number;
-        sampleGridHeight = newSettings.gridSize as number;
       }
       
       const sampleGrid = generateSampleGrid(sampleGridWidth, sampleGridHeight);

@@ -16,7 +16,7 @@ interface MosaicControlsProps {
 }
 
 export interface MosaicSettings {
-  gridSize: number | "auto";
+  gridSize: number | "auto" | "custom";
   gridWidth?: number;
   gridHeight?: number;
   diceSizeMm: number;
@@ -76,7 +76,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
 
   const handleGenerate = () => {
     onGenerate({
-      gridSize: independentDimensions ? "custom" as any : gridSize,
+      gridSize: independentDimensions ? "custom" : gridSize,
       gridWidth: independentDimensions ? gridWidth : typeof gridSize === "number" ? gridSize : undefined,
       gridHeight: independentDimensions ? gridHeight : typeof gridSize === "number" ? gridSize : undefined,
       diceSizeMm,
