@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 const MAX_DICE = 10000;
 const DEFAULT_SIZE = 50;
 
-// Updated interface to match how settings are actually used
+// Updated interface to match MosaicSettings and specify theme as a union type
 interface Settings {
   gridSize: number | "auto" | "custom";
   gridWidth?: number;
@@ -25,7 +24,7 @@ interface Settings {
   contrast: number;
   useShading: boolean;
   diceSizeMm: number;
-  theme?: string;
+  theme?: "black" | "white" | "mixed"; // Updated to match MosaicSettings
   faceColors: {
     1: string;
     2: string;
