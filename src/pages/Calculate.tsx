@@ -139,13 +139,14 @@ const Calculate = () => {
         description: `Your image has been converted to a dice mosaic pattern with ${totalDice} dice.`,
       });
     } catch (error) {
+      console.error("Image processing error:", error);
       toast({
         title: "Error processing image",
         description: "There was an error processing your image. Please try again.",
         variant: "destructive",
       });
-      console.error("Error processing image:", error);
     } finally {
+      // Always reset the processing state, whether successful or not
       setIsProcessing(false);
     }
   };
@@ -159,7 +160,7 @@ const Calculate = () => {
         // Start processing indicator
         setIsProcessing(true);
         
-        // Process the image immediately after upload with await to ensure it completes
+        // Process the image immediately after upload
         await processCurrentImage();
       } catch (error) {
         console.error("Error in image upload handler:", error);
@@ -168,6 +169,8 @@ const Calculate = () => {
           description: "There was a problem processing your image. Please try again.",
           variant: "destructive",
         });
+      } finally {
+        // Always ensure processing state is reset
         setIsProcessing(false);
       }
     } else {
@@ -181,9 +184,6 @@ const Calculate = () => {
     if (width * height < MAX_DICE) {
       setWidth(prev => Math.min(prev + 10, 100));
       setHeight(prev => Math.min(prev + 10, 100));
-      if (imageFile) {
-        processCurrentImage();
-      }
     } else {
       toast({
         title: "Maximum size reached",
@@ -196,44 +196,26 @@ const Calculate = () => {
   const decreaseSize = () => {
     setWidth(prev => Math.max(prev - 10, 10));
     setHeight(prev => Math.max(prev - 10, 10));
-    if (imageFile) {
-      processCurrentImage();
-    }
   };
 
   const increaseContrast = () => {
     setContrast(prev => Math.min(prev + 10, 100));
-    if (imageFile) {
-      processCurrentImage();
-    }
   };
 
   const decreaseContrast = () => {
     setContrast(prev => Math.max(prev - 10, 0));
-    if (imageFile) {
-      processCurrentImage();
-    }
   };
 
   const increaseBrightness = () => {
     setBrightness(prev => Math.min(prev + 10, 100));
-    if (imageFile) {
-      processCurrentImage();
-    }
   };
 
   const decreaseBrightness = () => {
     setBrightness(prev => Math.max(prev - 10, 0));
-    if (imageFile) {
-      processCurrentImage();
-    }
   };
 
   const handleInvertChange = (checked: boolean) => {
     setInvertColors(checked);
-    if (imageFile) {
-      processCurrentImage();
-    }
   };
 
   const openOutput = () => {
@@ -497,7 +479,6 @@ const Calculate = () => {
                     value={contrast} 
                     onChange={e => {
                       setContrast(parseInt(e.target.value) || 0);
-                      if (imageFile) processCurrentImage();
                     }} 
                     className="w-16" 
                     disabled={isProcessing}
@@ -535,7 +516,6 @@ const Calculate = () => {
                     value={brightness} 
                     onChange={e => {
                       setBrightness(parseInt(e.target.value) || 0);
-                      if (imageFile) processCurrentImage();
                     }} 
                     className="w-16" 
                     disabled={isProcessing}
