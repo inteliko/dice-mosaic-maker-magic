@@ -42,12 +42,12 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
     // Apply zoom to cell size with increased resolution multiplier
     const zoomedCellSize = cellSize * zoomLevel;
     
-    // Set canvas dimensions with high resolution multiplier (4x for even better quality)
-    const resolutionMultiplier = 4; // Increased resolution for better image quality when zoomed
+    // Improved resolution multiplier for better quality when zoomed
+    const resolutionMultiplier = Math.max(4, Math.ceil(zoomLevel * 2)); // Higher resolution with zoom
     const canvasWidth = cols * zoomedCellSize;
     const canvasHeight = rows * zoomedCellSize;
     
-    // Set the physical canvas size to the displayed size
+    // Set the physical canvas size to the displayed size with higher resolution
     canvas.width = canvasWidth * resolutionMultiplier;
     canvas.height = canvasHeight * resolutionMultiplier;
     

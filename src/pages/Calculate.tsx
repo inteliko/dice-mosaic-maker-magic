@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ImageUploader from "@/components/ImageUploader";
 import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
-import { FileDown, Plus, Minus, FileOutput } from "lucide-react";
+import { FileDown, Plus, Minus, FileOutput, Dices } from "lucide-react";
 import DicePreview from "@/components/DicePreview";
 import DiceCanvas from "@/components/DiceCanvas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -341,6 +341,17 @@ const Calculate = () => {
               <div className="p-4">
                 <Label className="text-lg font-medium mb-4 block">Image</Label>
                 <ImageUploader onImageUpload={handleImageUpload} id="imageUploader" />
+                
+                {/* Generate Mosaic Button */}
+                <Button 
+                  variant="default" 
+                  className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={processCurrentImage}
+                  disabled={!imageFile || isProcessing}
+                >
+                  <Dices className="w-4 h-4 mr-2" />
+                  Generate Mosaic
+                </Button>
               </div>
 
               {/* Desired Size */}
@@ -376,7 +387,6 @@ const Calculate = () => {
                       onChange={e => {
                         const newWidth = Math.min(parseInt(e.target.value) || 10, 100);
                         setWidth(newWidth);
-                        if (imageFile) processCurrentImage();
                       }} 
                       className="w-24" 
                       disabled={isProcessing}
@@ -392,7 +402,6 @@ const Calculate = () => {
                       onChange={e => {
                         const newHeight = Math.min(parseInt(e.target.value) || 10, 100);
                         setHeight(newHeight);
-                        if (imageFile) processCurrentImage();
                       }} 
                       className="w-24" 
                       disabled={isProcessing}
