@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -155,9 +154,22 @@ const Calculate = () => {
     // Check if this is a real file (not an empty file used for clearing)
     if (file.size > 0) {
       setImageFile(file);
-      // Process the image immediately after upload
-      // Added await here to ensure processing finishes before continuing
-      await processCurrentImage();
+      
+      try {
+        // Start processing indicator
+        setIsProcessing(true);
+        
+        // Process the image immediately after upload with await to ensure it completes
+        await processCurrentImage();
+      } catch (error) {
+        console.error("Error in image upload handler:", error);
+        toast({
+          title: "Upload error",
+          description: "There was a problem processing your image. Please try again.",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+      }
     } else {
       // Clear the current image if an empty file was provided
       setImageFile(null);

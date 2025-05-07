@@ -93,7 +93,10 @@ const DiceCanvas = ({ diceGrid, settings, onCanvasReady, zoomLevel = 1 }: DiceCa
       }
     }
 
-    onCanvasReady(canvas);
+    // Call the callback with the canvas reference
+    if (canvas) {
+      onCanvasReady(canvas);
+    }
   }, [diceGrid, settings, onCanvasReady, isMobile, zoomLevel]);
 
   return (
