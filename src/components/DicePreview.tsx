@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MosaicSettings } from "./MosaicControls";
 import DiceCanvas from "./DiceCanvas";
 import MosaicSummary from "./MosaicSummary";
 import DiceDownloadButtons from "./DiceDownloadButtons";
-import { ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DicePreviewProps {
@@ -33,7 +34,7 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
     if (!ctx) return;
     
     // Set higher resolution for download
-    const scaleFactor = 2; // Double resolution for downloads
+    const scaleFactor = 4; // Higher resolution for downloads
     downloadCanvas.width = currentCanvas.width * scaleFactor;
     downloadCanvas.height = currentCanvas.height * scaleFactor;
     
@@ -179,6 +180,16 @@ const DicePreview = ({ diceGrid, settings, blackDiceCount, whiteDiceCount, isVis
               onCanvasReady={setCurrentCanvas}
               zoomLevel={zoomLevel}
             />
+          </div>
+          
+          <div className="flex justify-center mt-4 mb-6">
+            <Button 
+              onClick={downloadImage}
+              className="bg-green-500 hover:bg-green-600 text-white"
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Generate PNG
+            </Button>
           </div>
           
           <div className="mosaic-info-grid mt-6">

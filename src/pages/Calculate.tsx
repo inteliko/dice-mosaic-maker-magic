@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -155,6 +156,7 @@ const Calculate = () => {
     if (file.size > 0) {
       setImageFile(file);
       // Process the image immediately after upload
+      // Added await here to ensure processing finishes before continuing
       await processCurrentImage();
     } else {
       // Clear the current image if an empty file was provided
@@ -537,6 +539,15 @@ const Calculate = () => {
                     canvasRef.current = canvas;
                   }}
                 />
+                <div className="mt-4 text-center">
+                  <Button 
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    onClick={downloadPNG}
+                  >
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Generate PNG
+                  </Button>
+                </div>
               </div>
             )}
           </div>
