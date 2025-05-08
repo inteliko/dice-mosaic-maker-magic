@@ -4,7 +4,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Ruler, Weight, Move, Circle, Square, Dices } from "lucide-react";
+import { Ruler, Weight, Move, Circle, Square, Dices, Sun, Contrast } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,6 +21,7 @@ export interface MosaicSettings {
   gridHeight?: number;
   diceSizeMm: number;
   contrast: number;
+  brightness?: number;
   useShading: boolean;
   faceColors: Record<number, string>;
   theme?: "black" | "white" | "mixed";
@@ -61,6 +62,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
   const [gridHeight, setGridHeight] = useState<number>(80);
   const [diceSizeMm, setDiceSizeMm] = useState(1.6); // Standard dice size 1.6cm
   const [contrast, setContrast] = useState(50);
+  const [brightness, setBrightness] = useState(50); // Added brightness state
   const [useShading, setUseShading] = useState(true);
   const [faceColors, setFaceColors] = useState<Record<number, string>>({...DEFAULT_COLORS});
   const [activeTheme, setActiveTheme] = useState<"mixed" | "black" | "white">("mixed");
@@ -81,6 +83,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
       gridHeight: independentDimensions ? gridHeight : typeof gridSize === "number" ? gridSize : undefined,
       diceSizeMm,
       contrast,
+      brightness, // Added brightness to the settings
       useShading,
       faceColors,
       theme: activeTheme,
@@ -93,6 +96,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
     setGridHeight(80);
     setDiceSizeMm(1.6);
     setContrast(50);
+    setBrightness(50); // Reset brightness
     setUseShading(true);
     setFaceColors({...DEFAULT_COLORS});
     setActiveTheme("mixed");
@@ -213,7 +217,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
                   <Slider 
                     min={10} 
                     max={150} 
-                    step={5} 
+                    step={1} // Changed from 5 to 1 for more precise control
                     value={[gridWidth]} 
                     onValueChange={(values) => setGridWidth(values[0])} 
                     className="py-2"
@@ -226,7 +230,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
                   <Slider 
                     min={10} 
                     max={150} 
-                    step={5} 
+                    step={1} // Changed from 5 to 1 for more precise control
                     value={[gridHeight]} 
                     onValueChange={(values) => setGridHeight(values[0])} 
                     className="py-2"
@@ -245,7 +249,7 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
                   id="grid-size"
                   min={10} 
                   max={150} 
-                  step={5} 
+                  step={1} // Changed from 5 to 1 for more precise control
                   value={[typeof gridSize === "number" ? gridSize : 80]} 
                   onValueChange={(values) => setGridSize(values[0])} 
                   className="py-2"
@@ -289,14 +293,36 @@ const MosaicControls = ({ onGenerate, blackDiceCount = 0, whiteDiceCount = 0, di
         </div>
 
         <div className="space-y-2 mt-4">
-          <Label htmlFor="contrast" className="text-sm">Contrast: {contrast}%</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="contrast" className="text-sm flex items-center gap-1">
+              <Contrast className="w-4 h-4" /> Contrast: {contrast}%
+            </Label>
+          </div>
           <Slider 
             id="contrast"
             min={0} 
-            max={100} 
+            max={250} // Increased from 100 to 250 (5x more)
             step={1} 
             value={[contrast]} 
             onValueChange={(values) => setContrast(values[0])} 
+            className="py-2"
+          />
+        </div>
+
+        {/* New brightness slider */}
+        <div className="space-y-2 mt-4">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="brightness" className="text-sm flex items-center gap-1">
+              <Sun className="w-4 h-4" /> Brightness: {brightness}%
+            </Label>
+          </div>
+          <Slider 
+            id="brightness"
+            min={0} 
+            max={100} 
+            step={1} 
+            value={[brightness]} 
+            onValueChange={(values) => setBrightness(values[0])} 
             className="py-2"
           />
         </div>
