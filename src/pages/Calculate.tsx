@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import ImageUploader from "@/components/ImageUploader";
 import { processImage } from "@/utils/imageProcessor";
 import Header from "@/components/Header";
-import { FileDown, Plus, Minus, FileOutput, Dices } from "lucide-react";
+import { FileDown, Plus, Minus, FileOutput, Dices, Circle, Square } from "lucide-react";
 import DicePreview from "@/components/DicePreview";
 import DiceCanvas from "@/components/DiceCanvas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const MAX_DICE = 10000;
 const DEFAULT_SIZE = 50;
@@ -40,7 +40,6 @@ const Calculate = () => {
   const [height, setHeight] = useState<number>(DEFAULT_SIZE);
   const [contrast, setContrast] = useState<number>(50);
   const [brightness, setBrightness] = useState<number>(50);
-  const [invertColors, setInvertColors] = useState<boolean>(false);
   const [diceGrid, setDiceGrid] = useState<number[][]>([]);
   const [diceCount, setDiceCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -61,6 +60,10 @@ const Calculate = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [outputDialogOpen, setOutputDialogOpen] = useState<boolean>(false);
+  
+  // New state for dice theme, replacing invertColors
+  const [diceTheme, setDiceTheme] = useState<"mixed" | "black" | "white">("mixed");
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { toast } = useToast();
 
@@ -107,6 +110,9 @@ const Calculate = () => {
         description: "Please wait while we convert your image to dice...",
       });
       
+      // Use theme instead of invertColors for image processing
+      const invertColors = diceTheme === "black";
+      
       // Use width and height for the custom grid size
       const grid = await processImage(
         imageFile, 
@@ -124,7 +130,7 @@ const Calculate = () => {
       const totalDice = grid.length * grid[0].length;
       setDiceCount(totalDice);
       
-      // Update settings with correctly typed values
+      // Update settings with correctly typed values and theme
       setSettings(prev => ({
         ...prev,
         gridSize: "custom" as const,
@@ -132,6 +138,7 @@ const Calculate = () => {
         gridHeight: height,
         contrast,
         diceSizeMm: 1.6,
+        theme: diceTheme, // Add the theme to settings
       }));
       
       toast({
@@ -214,8 +221,21 @@ const Calculate = () => {
     setBrightness(prev => Math.max(prev - 10, 0));
   };
 
-  const handleInvertChange = (checked: boolean) => {
-    setInvertColors(checked);
+  // Handle theme change
+  const handleThemeChange = (value: string) => {
+    if (value === "black" || value === "white" || value === "mixed") {
+      setDiceTheme(value);
+      
+      // Automatically process image if one is loaded
+      if (imageFile && !isProcessing) {
+        processCurrentImage();
+      }
+      
+      toast({
+        title: `${value.charAt(0).toUpperCase() + value.slice(1)} Dice Theme`,
+        description: `Switched to ${value} dice theme`,
+      });
+    }
   };
 
   const openOutput = () => {
@@ -422,15 +442,37 @@ const Calculate = () => {
               <div className="p-4">
                 <Label className="text-lg font-medium mb-4 block">Export</Label>
                 
-                <div className="mb-4 flex items-center">
-                  <Checkbox 
-                    id="invertColors" 
-                    checked={invertColors}
-                    onCheckedChange={handleInvertChange}
-                  />
-                  <label htmlFor="invertColors" className="ml-2 text-sm font-medium">
-                    Invert (black dice)
-                  </label>
+                {/* Replace checkbox with toggle group for theme selection */}
+                <div className="mb-4">
+                  <Label className="text-sm mb-2 block">Dice Theme</Label>
+                  <ToggleGroup 
+                    type="single" 
+                    value={diceTheme}
+                    onValueChange={handleThemeChange}
+                    className="justify-start"
+                  >
+                    <ToggleGroupItem 
+                      value="black" 
+                      aria-label="Black dice"
+                      className="flex items-center gap-1 px-2 py-1 text-xs"
+                    >
+                      <Square className="w-3 h-3" /> Black
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="white" 
+                      aria-label="White dice"
+                      className="flex items-center gap-1 px-2 py-1 text-xs"
+                    >
+                      <Circle className="w-3 h-3" /> White
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="mixed" 
+                      aria-label="Mixed dice"
+                      className="flex items-center gap-1 px-2 py-1 text-xs"
+                    >
+                      <Dices className="w-3 h-3" /> Mixed
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                 </div>
                 
                 <Button 
